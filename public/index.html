@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game Awards API - The Board Game Awards Database</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        header {
+            text-align: center;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+        }
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 0.5rem;
+            font-size: 2.5rem;
+        }
+        .subtitle {
+            color: #7f8c8d;
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+        }
+        .tagline {
+            color: #34495e;
+            font-style: italic;
+        }
+        .content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+        .card h2 {
+            color: #2c3e50;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 0.5rem;
+        }
+        .api-demo {
+            grid-column: 1 / -1;
+        }
+        .endpoint {
+            background: #2c3e50;
+            color: #ecf0f1;
+            padding: 1rem;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            margin: 0.5rem 0;
+            overflow-x: auto;
+        }
+        .example {
+            background: #ecf0f1;
+            padding: 1rem;
+            border-left: 4px solid #3498db;
+            margin: 1rem 0;
+        }
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+        .feature {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 1.5rem;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+        }
+        .feature h3 {
+            color: #2c3e50;
+            margin-bottom: 1rem;
+        }
+        .icon {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+        .cta {
+            text-align: center;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+        .btn {
+            display: inline-block;
+            background: #3498db;
+            color: white;
+            padding: 1rem 2rem;
+            text-decoration: none;
+            border-radius: 5px;
+            margin: 0.5rem;
+            transition: background 0.3s;
+        }
+        .btn:hover {
+            background: #2980b9;
+        }
+        .pricing {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+        .pricing-card {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 2rem;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+        .pricing-card.featured {
+            border: 3px solid #3498db;
+            transform: scale(1.05);
+        }
+        .price {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #2c3e50;
+            margin: 1rem 0;
+        }
+        .badge {
+            background: #3498db;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            font-size: 0.8rem;
+        }
+        footer {
+            text-align: center;
+            color: rgba(255, 255, 255, 0.8);
+            padding: 2rem;
+        }
+        .code {
+            font-family: 'Courier New', monospace;
+            background: #34495e;
+            color: #ecf0f1;
+            padding: 0.2rem 0.5rem;
+            border-radius: 3px;
+        }
+        @media (max-width: 768px) {
+            .content {
+                grid-template-columns: 1fr;
+            }
+            h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🎲 Game Awards API</h1>
+            <p class="subtitle">The Board Game Awards Database</p>
+            <p class="tagline">A RESTful web service to obtain board game award information, all content contributed and maintained by the gaming community.</p>
+        </header>
+
+        <div class="content">
+            <div class="card">
+                <h2>📋 Usage</h2>
+                <p>Send all data requests to:</p>
+                <div class="endpoint">https://gameawards.netlify.app/api/?apikey=[yourkey]&</div>
+                
+                <h3>Parameters</h3>
+                <ul>
+                    <li><span class="code">i</span> - Award ID (e.g. 10865)</li>
+                    <li><span class="code">t</span> - Award title to search for</li>
+                    <li><span class="code">s</span> - Search across all fields</li>
+                    <li><span class="code">bgg_id</span> - BoardGameGeek game ID</li>
+                    <li><span class="code">year</span> - Year of award</li>
+                    <li><span class="code">category</span> - Award category/position</li>
+                    <li><span class="code">award_set</span> - Award set name</li>
+                </ul>
+            </div>
+
+            <div class="card">
+                <h2>🔍 Examples</h2>
+                <div class="example">
+                    <strong>Get award by ID:</strong><br>
+                    <span class="code">?i=10865&apikey=yourkey</span>
+                </div>
+                <div class="example">
+                    <strong>Search for "Spiel des Jahres":</strong><br>
+                    <span class="code">?s=Spiel des Jahres&apikey=yourkey</span>
+                </div>
+                <div class="example">
+                    <strong>Get all awards for a game:</strong><br>
+                    <span class="code">?bgg_id=361&apikey=yourkey</span>
+                </div>
+                <div class="example">
+                    <strong>Awards from 2020:</strong><br>
+                    <span class="code">?s=winner&year=2020&apikey=yourkey</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="features">
+            <div class="feature">
+                <div class="icon">🏆</div>
+                <h3>Comprehensive Awards</h3>
+                <p>Over 140+ board game awards spanning decades of gaming history from Spiel des Jahres to Origins Awards.</p>
+            </div>
+            <div class="feature">
+                <div class="icon">🎮</div>
+                <h3>BGG Integration</h3>
+                <p>Direct integration with BoardGameGeek IDs for seamless connection to the world's largest board game database.</p>
+            </div>
+            <div class="feature">
+                <div class="icon">⚡</div>
+                <h3>Fast & Reliable</h3>
+                <p>Built for speed with CDN caching and optimized search algorithms. Response times under 100ms.</p>
+            </div>
+            <div class="feature">
+                <div class="icon">📊</div>
+                <h3>Rich Metadata</h3>
+                <p>Detailed award information including categories, years, winners, nominees, and award prestige levels.</p>
+            </div>
+        </div>
+
+        <div class="card api-demo">
+            <h2>🚀 Quick Start</h2>
+            <p>Try the API right now with these sample requests:</p>
+            
+            <div class="endpoint">
+                GET /api/?s=Spiel des Jahres&year=2023
+            </div>
+            <div class="endpoint">
+                GET /api/?bgg_id=361
+            </div>
+            <div class="endpoint">
+                GET /api/years/2023
+            </div>
+            <div class="endpoint">
+                GET /api/awards (list all award sets)
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>💳 Pricing</h2>
+            <div class="pricing">
+                <div class="pricing-card">
+                    <h3>Free Tier</h3>
+                    <div class="price">$0</div>
+                    <ul>
+                        <li>1,000 requests/day</li>
+                        <li>Basic search & lookup</li>
+                        <li>JSON responses</li>
+                        <li>Community support</li>
+                    </ul>
+                    <a href="/apikey" class="btn">Get Free API Key</a>
+                </div>
+                <div class="pricing-card featured">
+                    <div class="badge">Most Popular</div>
+                    <h3>Professional</h3>
+                    <div class="price">$5<span style="font-size: 1rem;">/month</span></div>
+                    <ul>
+                        <li>100,000 requests/month</li>
+                        <li>Advanced search filters</li>
+                        <li>Priority support</li>
+                        <li>Usage analytics</li>
+                    </ul>
+                    <a href="/subscribe" class="btn">Subscribe</a>
+                </div>
+                <div class="pricing-card">
+                    <h3>Enterprise</h3>
+                    <div class="price">$25<span style="font-size: 1rem;">/month</span></div>
+                    <ul>
+                        <li>Unlimited requests</li>
+                        <li>Custom endpoints</li>
+                        <li>White-label options</li>
+                        <li>Dedicated support</li>
+                    </ul>
+                    <a href="/contact" class="btn">Contact Us</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="cta">
+            <h2>Ready to get started?</h2>
+            <p>Join thousands of developers, publishers, and gaming enthusiasts using the Game Awards API.</p>
+            <a href="/apikey" class="btn">Get Your Free API Key</a>
+            <a href="/docs" class="btn">View Documentation</a>
+        </div>
+    </div>
+
+    <footer>
+        <p>© 2024 Game Awards API. Built with ❤️ for the board gaming community.</p>
+        <p>Not affiliated with BoardGameGeek, Spiel des Jahres, or other award organizations.</p>
+    </footer>
+
+    <script>
+        // Add some interactive demo functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            // Simple API demo - you could enhance this with actual API calls
+            console.log('🎲 Game Awards API - Ready to serve board game award data!');
+        });
+    </script>
+</body>
+</html>
