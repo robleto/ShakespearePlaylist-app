@@ -2,15 +2,16 @@ name: Scrape Shakespeare Productions
 
 on:
   schedule:
-    # Run at 3:15 AM UTC every day
-    - cron: '15 3 * * *'
+    - cron: "15 3 * * *"
   workflow_dispatch:
-    # Allow manual runs
 
 jobs:
   scrape:
     runs-on: ubuntu-latest
-    
+    # Job-level secrets (configure these in the repository settings)
+    env:
+      DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      NEXTAUTH_SECRET: ${{ secrets.NEXTAUTH_SECRET }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -18,7 +19,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: 18
           
       - name: Setup pnpm
         uses: pnpm/action-setup@v2
@@ -30,16 +31,9 @@ jobs:
         
       - name: Generate Prisma client
         run: pnpm prisma generate
-        env:
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
           
       - name: Run scraper
         run: pnpm scrape
-        env:
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
-          NEXTAUTH_SECRET: ${{ secrets.NEXTAUTH_SECRET }}
           
       - name: Check scraping results
-        run: |
-          echo "Scraping completed"
-          # Could add notification logic here
+        run: echo "Scraping completed"

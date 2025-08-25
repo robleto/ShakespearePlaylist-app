@@ -2,28 +2,16 @@ import Link from 'next/link'
 import { Calendar, MapPin, ExternalLink } from 'lucide-react'
 import { PLAY_TITLES } from '../lib/normalization/plays'
 import { formatDateRange } from '../lib/utils/date'
+import type { Production as PrismaProduction, Company, Venue } from '@prisma/client'
 
-interface Production {
-  id: string
-  titleRaw: string
-  canonicalPlay: string
-  startDate: Date | string
-  endDate: Date | string
-  eventUrl?: string | null
-  priceMin?: number | null
-  priceMax?: number | null
-  company: {
-    name: string
-    city: string
-    region: string
-  }
-  venue?: {
-    name: string
-  } | null
+// Type for production with included relations
+export type ProductionWithRelations = PrismaProduction & {
+  company: Company
+  venue?: Venue | null
 }
 
 interface ProductionCardProps {
-  production: Production
+  production: ProductionWithRelations
 }
 
 export function ProductionCard({ production }: ProductionCardProps) {

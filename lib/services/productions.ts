@@ -1,11 +1,17 @@
 import { prisma } from '../db'
-import type { Production, Company, Venue } from '@prisma/client'
+import type { Production, Company, Venue, CanonicalPlay } from '@prisma/client'
 import type { NormalizedEvent } from '../normalization/normalize'
 
 export interface CreateProductionData extends Omit<NormalizedEvent, 'sourceConfidence'> {
   companyId: string
   venueId?: string
   sourceConfidence?: number
+}
+
+// Type for production with included relations
+export type ProductionWithRelations = Production & {
+  company: Company
+  venue?: Venue | null
 }
 
 export async function createProduction(data: CreateProductionData): Promise<Production> {
@@ -17,7 +23,7 @@ export async function createProduction(data: CreateProductionData): Promise<Prod
       canonicalPlay: data.canonicalPlay,
       startDate: data.startDate,
       endDate: data.endDate,
-      perfDates: data.perfDates ? JSON.stringify(data.perfDates) : null,
+      perfDates: data.perfDates ? JSON.stringify(data.perfDates) : undefined,
       eventUrl: data.eventUrl,
       priceMin: data.priceMin,
       priceMax: data.priceMax,
@@ -38,7 +44,7 @@ export async function findDuplicateProduction(
   return prisma.production.findFirst({
     where: {
       companyId,
-      canonicalPlay,
+      canonicalPlay: canonicalPlay as CanonicalPlay,
       AND: [
         {
           OR: [
@@ -137,7 +143,19 @@ export async function archiveProduction(productionId: string) {
 
 export async function updateProduction(
   productionId: string,
-  data: Partial<Omit<Production, 'id' | 'createdAt' | 'updatedAt'>>
+  data: {
+    titleRaw?: string
+    canonicalPlay?: CanonicalPlay
+    startDate?: Date
+    endDate?: Date
+    perfDates?: any
+    eventUrl?: string
+    priceMin?: number
+    priceMax?: number
+    notes?: string
+    sourceConfidence?: number
+    status?: 'PUBLISHED' | 'REVIEW' | 'ARCHIVED'
+  }
 ) {
   return prisma.production.update({
     where: { id: productionId },
@@ -159,7 +177,11 @@ export async function searchProductions(
   filters: ProductionFilters,
   limit = 20,
   cursor?: string
-) {
+): Promise<{
+  productions: ProductionWithRelations[]
+  nextCursor: string | null
+  hasMore: boolean
+}> {
   const where: any = {}
 
   if (filters.play) {
@@ -211,7 +233,7 @@ export async function searchProductions(
     queryOptions.skip = 1
   }
 
-  const productions = await prisma.production.findMany(queryOptions)
+  const productions = await prisma.production.findMany(queryOptions) as ProductionWithRelations[]
   
   const hasMore = productions.length > limit
   if (hasMore) {

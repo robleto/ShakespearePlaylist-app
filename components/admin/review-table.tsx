@@ -2,24 +2,13 @@
 
 import { useState } from 'react'
 import { Check, X, Edit } from 'lucide-react'
-import { PLAY_TITLES } from '../../../lib/normalization/plays'
-import { formatDateRange } from '../../../lib/utils/date'
+import { PLAY_TITLES } from '../../lib/normalization/plays'
+import { formatDateRange } from '../../lib/utils/date'
+import type { Production as PrismaProduction, Company, Venue } from '@prisma/client'
 
-interface Production {
-  id: string
-  titleRaw: string
-  canonicalPlay: string
-  startDate: Date | string
-  endDate: Date | string
-  sourceConfidence: number
-  company: {
-    name: string
-    city: string
-    region: string
-  }
-  venue?: {
-    name: string
-  } | null
+type Production = PrismaProduction & {
+  company: Company
+  venue?: Venue | null
 }
 
 interface ReviewTableProps {

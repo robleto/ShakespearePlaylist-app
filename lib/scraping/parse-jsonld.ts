@@ -36,8 +36,8 @@ export function parseJSONLD(htmlContent: string): JSONLDEvent[] {
   const events: JSONLDEvent[] = []
   
   try {
-    // Find all JSON-LD script tags
-    const scriptRegex = /<script[^>]*type=["\']application\/ld\+json["\'][^>]*>(.*?)<\/script>/gis
+    // Find all JSON-LD script tags - use [\s\S] instead of . with s flag for broader compatibility
+    const scriptRegex = /<script[^>]*type=["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi
     let match
 
     while ((match = scriptRegex.exec(htmlContent)) !== null) {
