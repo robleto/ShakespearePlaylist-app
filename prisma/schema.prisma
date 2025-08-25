@@ -1,0 +1,235 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+}
+
+enum SourceKind {
+  ICS
+  JSONLD
+  HTML
+}
+
+enum ProductionStatus {
+  PUBLISHED
+  REVIEW
+  ARCHIVED
+}
+
+enum CanonicalPlay {
+  ALL_S_WELL_THAT_ENDS_WELL
+  ANTONY_AND_CLEOPATRA
+  AS_YOU_LIKE_IT
+  COMEDY_OF_ERRORS
+  CORIOLANUS
+  CYMBELINE
+  HAMLET
+  HENRY_IV_PART_1
+  HENRY_IV_PART_2
+  HENRY_V
+  HENRY_VI_PART_1
+  HENRY_VI_PART_2
+  HENRY_VI_PART_3
+  HENRY_VIII
+  JULIUS_CAESAR
+  KING_JOHN
+  KING_LEAR
+  LOVE_S_LABOUR_S_LOST
+  MACBETH
+  MEASURE_FOR_MEASURE
+  MERCHANT_OF_VENICE
+  MERRY_WIVES_OF_WINDSOR
+  MIDSUMMER_NIGHT_S_DREAM
+  MUCH_ADO_ABOUT_NOTHING
+  OTHELLO
+  RICHARD_II
+  RICHARD_III
+  ROMEO_AND_JULIET
+  TAMING_OF_THE_SHREW
+  TEMPEST
+  TIMON_OF_ATHENS
+  TITUS_ANDRONICUS
+  TROILUS_AND_CRESSIDA
+  TWELFTH_NIGHT
+  TWO_GENTLEMEN_OF_VERONA
+  WINTER_S_TALE
+  PERICLES
+  EDWARD_III
+  TWO_NOBLE_KINSMEN
+  OTHER
+}
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  emailVerified DateTime?
+  role          Role      @default(ADMIN)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  accounts Account[]
+  sessions Session[]
+
+  @@map("users")
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@map("accounts")
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+  @@map("verification_tokens")
+}
+
+model Company {
+  id        String   @id @default(uuid())
+  name      String
+  website   String
+  city      String
+  region    String
+  country   String   @default("US")
+  lat       Float?
+  lng       Float?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  venues      Venue[]
+  sources     Source[]
+  productions Production[]
+
+  @@map("companies")
+}
+
+model Venue {
+  id        String   @id @default(uuid())
+  name      String
+  address   String?
+  city      String
+  region    String
+  country   String   @default("US")
+  lat       Float?
+  lng       Float?
+  companyId String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  company     Company?     @relation(fields: [companyId], references: [id])
+  productions Production[]
+
+  @@map("venues")
+}
+
+model Source {
+  id           String     @id @default(uuid())
+  companyId    String
+  url          String
+  kind         SourceKind
+  parserName   String
+  enabled      Boolean    @default(true)
+  lastRunAt    DateTime?
+  lastStatus   String?
+  etag         String?
+  lastModified String?
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  company Company   @relation(fields: [companyId], references: [id])
+  rawPages RawPage[]
+
+  @@map("sources")
+}
+
+model Production {
+  id                String           @id @default(uuid())
+  companyId         String
+  venueId           String?
+  titleRaw          String
+  canonicalPlay     CanonicalPlay
+  startDate         DateTime
+  endDate           DateTime
+  perfDates         Json?
+  eventUrl          String?
+  priceMin          Int?
+  priceMax          Int?
+  notes             String?
+  lastSeenAt        DateTime         @default(now())
+  status            ProductionStatus @default(REVIEW)
+  sourceConfidence  Float            @default(0.5)
+  createdAt         DateTime         @default(now())
+  updatedAt         DateTime         @updatedAt
+
+  company Company @relation(fields: [companyId], references: [id])
+  venue   Venue?  @relation(fields: [venueId], references: [id])
+
+  @@index([companyId, canonicalPlay, startDate])
+  @@map("productions")
+}
+
+model RawPage {
+  id           String   @id @default(uuid())
+  sourceId     String
+  fetchedAt    DateTime @default(now())
+  url          String
+  httpStatus   Int
+  etag         String?
+  lastModified String?
+  contentHash  String
+  content      String   @db.Text
+  createdAt    DateTime @default(now())
+
+  source Source @relation(fields: [sourceId], references: [id])
+
+  @@map("raw_pages")
+}
+
+model Alias {
+  id            String        @id @default(uuid())
+  rawPattern    String
+  canonicalPlay CanonicalPlay
+  confidence    Float         @default(0.8)
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  @@map("aliases")
+}

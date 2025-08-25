@@ -1,0 +1,228 @@
+import { prisma } from '../db'
+import type { Production, Company, Venue } from '@prisma/client'
+import type { NormalizedEvent } from '../normalization/normalize'
+
+export interface CreateProductionData extends Omit<NormalizedEvent, 'sourceConfidence'> {
+  companyId: string
+  venueId?: string
+  sourceConfidence?: number
+}
+
+export async function createProduction(data: CreateProductionData): Promise<Production> {
+  return prisma.production.create({
+    data: {
+      companyId: data.companyId,
+      venueId: data.venueId,
+      titleRaw: data.titleRaw,
+      canonicalPlay: data.canonicalPlay,
+      startDate: data.startDate,
+      endDate: data.endDate,
+      perfDates: data.perfDates ? JSON.stringify(data.perfDates) : null,
+      eventUrl: data.eventUrl,
+      priceMin: data.priceMin,
+      priceMax: data.priceMax,
+      notes: data.notes,
+      sourceConfidence: data.sourceConfidence || 0.5,
+      status: data.sourceConfidence && data.sourceConfidence > 0.8 ? 'PUBLISHED' : 'REVIEW',
+    },
+  })
+}
+
+export async function findDuplicateProduction(
+  companyId: string,
+  canonicalPlay: string,
+  startDate: Date,
+  endDate: Date
+): Promise<Production | null> {
+  // Find production with overlapping dates for the same company and play
+  return prisma.production.findFirst({
+    where: {
+      companyId,
+      canonicalPlay,
+      AND: [
+        {
+          OR: [
+            // Start date falls within existing production's date range
+            {
+              AND: [
+                { startDate: { lte: startDate } },
+                { endDate: { gte: startDate } },
+              ],
+            },
+            // End date falls within existing production's date range
+            {
+              AND: [
+                { startDate: { lte: endDate } },
+                { endDate: { gte: endDate } },
+              ],
+            },
+            // New production completely contains existing production
+            {
+              AND: [
+                { startDate: { gte: startDate } },
+                { endDate: { lte: endDate } },
+              ],
+            },
+          ],
+        },
+      ],
+    },
+  })
+}
+
+export async function updateProductionLastSeen(productionId: string): Promise<Production> {
+  return prisma.production.update({
+    where: { id: productionId },
+    data: { lastSeenAt: new Date() },
+  })
+}
+
+export async function createOrUpdateProduction(
+  data: CreateProductionData
+): Promise<{ production: Production; isNew: boolean }> {
+  // Check for duplicates
+  const existing = await findDuplicateProduction(
+    data.companyId,
+    data.canonicalPlay,
+    data.startDate,
+    data.endDate
+  )
+
+  if (existing) {
+    // Update last seen timestamp
+    const production = await updateProductionLastSeen(existing.id)
+    return { production, isNew: false }
+  } else {
+    // Create new production
+    const production = await createProduction(data)
+    return { production, isNew: true }
+  }
+}
+
+export async function getProductionsByStatus(status: 'PUBLISHED' | 'REVIEW' | 'ARCHIVED') {
+  return prisma.production.findMany({
+    where: { status },
+    include: {
+      company: true,
+      venue: true,
+    },
+    orderBy: { startDate: 'asc' },
+  })
+}
+
+export async function getProductionsForReview() {
+  return prisma.production.findMany({
+    where: { status: 'REVIEW' },
+    include: {
+      company: true,
+      venue: true,
+    },
+    orderBy: { createdAt: 'desc' },
+  })
+}
+
+export async function approveProduction(productionId: string) {
+  return prisma.production.update({
+    where: { id: productionId },
+    data: { status: 'PUBLISHED' },
+  })
+}
+
+export async function archiveProduction(productionId: string) {
+  return prisma.production.update({
+    where: { id: productionId },
+    data: { status: 'ARCHIVED' },
+  })
+}
+
+export async function updateProduction(
+  productionId: string,
+  data: Partial<Omit<Production, 'id' | 'createdAt' | 'updatedAt'>>
+) {
+  return prisma.production.update({
+    where: { id: productionId },
+    data,
+  })
+}
+
+export interface ProductionFilters {
+  play?: string
+  companyId?: string
+  q?: string
+  near?: { lat: number; lng: number; radius: number }
+  start?: Date
+  end?: Date
+  status?: 'PUBLISHED' | 'REVIEW' | 'ARCHIVED'
+}
+
+export async function searchProductions(
+  filters: ProductionFilters,
+  limit = 20,
+  cursor?: string
+) {
+  const where: any = {}
+
+  if (filters.play) {
+    where.canonicalPlay = filters.play
+  }
+
+  if (filters.companyId) {
+    where.companyId = filters.companyId
+  }
+
+  if (filters.status) {
+    where.status = filters.status
+  } else {
+    where.status = 'PUBLISHED' // Default to published only
+  }
+
+  if (filters.q) {
+    where.OR = [
+      { titleRaw: { contains: filters.q, mode: 'insensitive' } },
+      { company: { name: { contains: filters.q, mode: 'insensitive' } } },
+      { company: { city: { contains: filters.q, mode: 'insensitive' } } },
+    ]
+  }
+
+  if (filters.start || filters.end) {
+    where.AND = where.AND || []
+    
+    if (filters.start) {
+      where.AND.push({ endDate: { gte: filters.start } })
+    }
+    
+    if (filters.end) {
+      where.AND.push({ startDate: { lte: filters.end } })
+    }
+  }
+
+  const queryOptions: any = {
+    where,
+    include: {
+      company: true,
+      venue: true,
+    },
+    orderBy: { startDate: 'asc' },
+    take: limit + 1, // Take one extra to check if there are more
+  }
+
+  if (cursor) {
+    queryOptions.cursor = { id: cursor }
+    queryOptions.skip = 1
+  }
+
+  const productions = await prisma.production.findMany(queryOptions)
+  
+  const hasMore = productions.length > limit
+  if (hasMore) {
+    productions.pop()
+  }
+
+  const nextCursor = hasMore ? productions[productions.length - 1]?.id : null
+
+  return {
+    productions,
+    nextCursor,
+    hasMore,
+  }
+}
