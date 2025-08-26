@@ -2,7 +2,7 @@
 // Stripe webhook handler for subscription events
 
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
-const db = require('../../dev-scripts/database');
+const db = require('../../config/database');
 
 exports.handler = async (event, context) => {
   const sig = event.headers['stripe-signature'];

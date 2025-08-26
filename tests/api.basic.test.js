@@ -3,7 +3,7 @@
  Will expand with DB + Stripe integration coverage.
 */
 
-const { handler } = require('../netlify/functions/api');
+const { handler } = require('../../netlify/functions/api');
 
 describe('API basic smoke tests', () => {
   test('search wingspan (demo key)', async () => {

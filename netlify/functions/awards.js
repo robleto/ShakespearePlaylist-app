@@ -1,4 +1,4 @@
-const awardsData = require('../../dev-scripts/awards-data');
+const awardsData = require('../../lib/awards-data');
 
 exports.handler = async (event, context) => {
   const headers = {

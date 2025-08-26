@@ -9,7 +9,7 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 // Load awards data
-const awardsData = require('./dev-scripts/awards-data');
+const awardsData = require('./lib/awards-data');
 
 // Middleware
 app.use(helmet());

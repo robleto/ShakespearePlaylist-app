@@ -1,7 +1,5 @@
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
-const { neon } = require('@neondatabase/serverless');
-
-const sql = neon(process.env.DATABASE_URL);
+const db = require('../../config/database');
 
 // Price ID mapping from environment variables
 const STRIPE_PRICES = {
@@ -114,37 +112,31 @@ exports.handler = async (event, context) => {
 
     console.log(`Created subscription: ${subscription.id}`);
 
-    // Generate API key in database
-    const apiKeyResult = await sql`
-      SELECT generate_api_key(
-        ${email}::text,
-        ${name}::text,
-        null::text,
-        'Stripe subscription'::text,
-        ${'Tier: ' + planConfig.tier}::text
-      ) as result
-    `;
+    // Generate API key via helper
+    const keyResult = await db.generateApiKey(
+      email,
+      name,
+      null,
+      'Stripe subscription',
+      'Tier: ' + planConfig.tier
+    );
 
-    const apiKeyData = apiKeyResult[0]?.result;
-    if (!apiKeyData?.success) {
-      throw new Error('Failed to generate API key: ' + (apiKeyData?.error || 'Unknown error'));
+    if (!keyResult || !keyResult.success) {
+      throw new Error('Failed to generate API key: ' + (keyResult?.error || 'Unknown error'));
     }
 
-    const apiKey = apiKeyData.api_key;
+    const apiKey = keyResult.api_key;
 
-    // Update API key with subscription details
-    await sql`
-      UPDATE api_keys 
-      SET 
-        tier = ${planConfig.tier}::text,
-        daily_limit = ${planConfig.daily_limit}::integer,
-        monthly_limit = ${planConfig.monthly_limit}::integer,
-        stripe_customer_id = ${customer.id}::text,
-        stripe_subscription_id = ${subscription.id}::text
-      WHERE key_hash = encode(digest(${apiKey}::text, 'sha256'), 'hex')
-    `;
+    // Apply subscription limits & stripe linkage
+    await db.updateApiKeyLimits(apiKey, {
+      tier: planConfig.tier,
+      daily_limit: planConfig.daily_limit,
+      monthly_limit: planConfig.monthly_limit,
+      stripe_customer_id: customer.id,
+      stripe_subscription_id: subscription.id
+    });
 
-    console.log(`Generated API key for ${email}`);
+    console.log(`Generated API key & applied limits for ${email}`);
 
     // Return subscription details
     const result = {
@@ -152,7 +144,7 @@ exports.handler = async (event, context) => {
       subscription_id: subscription.id,
       customer_id: customer.id,
       client_secret: subscription.latest_invoice.payment_intent.client_secret,
-      api_key: apiKey,
+  api_key: apiKey,
       plan: planConfig.tier,
       daily_limit: planConfig.daily_limit,
       monthly_limit: planConfig.monthly_limit,

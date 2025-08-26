@@ -1,6 +1,6 @@
 # Game Awards API
 
-A RESTful API for board game awards data (an OMDB-style service for tabletop). Query 5,995 awards covering 7,079 games, 1,101 award sets, 499 categories across 52 years.
+A RESTful API for board game awards data (an OMDB-style service for tabletop). Public sample ships with a limited subset; a larger private dataset (non-redistributable) can be mounted under `internal/`.
 
 git add .
 git commit -m "Deploy Game Awards API"
@@ -202,10 +202,14 @@ We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) f
 
 ### Adding / Updating Awards Data
 
-Current search layer reads from `enhanced-honors-complete.json`. Upcoming migration will populate a relational awards table; until then:
-1. Edit `enhanced-honors-complete.json`
-2. Run a few representative queries (`npm run query -- "s=wingspan"`)
-3. Open PR with rationale + source links
+Current search layer reads from `lib/awards-data.js`, which attempts to load a private full dataset at `internal/enhanced-honors-complete.json` (gitignored). The repo includes a minimal `data/sample-awards.json` for development & demonstrations.
+
+To use a full dataset privately:
+1. Place the JSON file at `internal/enhanced-honors-complete.json`
+2. Restart local dev (`npm run dev` or `netlify dev`)
+3. The loader will detect and use it automatically (log line: "Loaded full private dataset").
+
+Please do NOT submit PRs containing proprietary or third‑party dataset dumps. Schema/structure improvements are welcome.
 
 ## 📝 License
 
@@ -225,4 +229,4 @@ MIT License - see [LICENSE](LICENSE) file for details.
 
 ---
 
-**🎲 Game Awards API** – Bringing board game award data to developers worldwide. See `BUSINESS-STRATEGY.md` for market & roadmap.
+**🎲 Game Awards API** – Bringing board game award data to developers worldwide.

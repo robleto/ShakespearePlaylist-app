@@ -31,6 +31,7 @@ coverage/
 dev-scripts/
 docs-archive/
 database-archive/
+internal/
 
 # Build artifacts
 build-info.json

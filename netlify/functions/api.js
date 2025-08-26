@@ -1,8 +1,8 @@
-const db = require('../../dev-scripts/database');
+const db = require('../../config/database');
 
 // Load awards data (for now, still using JSON file)
 // In production, this would come from the database
-const awardsData = require('../../dev-scripts/awards-data');
+const awardsData = require('../../lib/awards-data');
 
 exports.handler = async (event, context) => {
   // Enable CORS

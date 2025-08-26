@@ -1,7 +1,5 @@
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
-const { neon } = require('@neondatabase/serverless');
-
-const sql = neon(process.env.DATABASE_URL);
+const db = require('../../config/database');
 
 // Price ID mapping from environment variables
 const STRIPE_PRICES = {
@@ -114,24 +112,31 @@ exports.handler = async (event, context) => {
 
     console.log(`Created subscription: ${subscription.id}`);
 
-    // Generate API key in database
-    const apiKeyResult = await sql`
-      SELECT generate_api_key(
-        ${email}::text,
-        ${planConfig.tier}::subscription_tier,
-        ${planConfig.daily_limit}::integer,
-        ${planConfig.monthly_limit}::integer,
-        ${customer.id}::text,
-        ${subscription.id}::text
-      ) as api_key
-    `;
+    // Generate API key
+    const keyResult = await db.generateApiKey(
+      email,
+      null,
+      null,
+      'Stripe subscription',
+      'Tier: ' + planConfig.tier
+    );
 
-    const apiKey = apiKeyResult[0]?.api_key;
-    if (!apiKey) {
-      throw new Error('Failed to generate API key');
+    if (!keyResult || !keyResult.success) {
+      throw new Error('Failed to generate API key: ' + (keyResult?.error || 'Unknown error'));
     }
 
-    console.log(`Generated API key for ${email}`);
+    const apiKey = keyResult.api_key;
+
+    // Apply tier & stripe linkage
+    await db.updateApiKeyLimits(apiKey, {
+      tier: planConfig.tier,
+      daily_limit: planConfig.daily_limit,
+      monthly_limit: planConfig.monthly_limit,
+      stripe_customer_id: customer.id,
+      stripe_subscription_id: subscription.id
+    });
+
+    console.log(`Generated API key & applied limits for ${email}`);
 
     // Return subscription details
     const result = {

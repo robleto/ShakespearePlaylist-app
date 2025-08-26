@@ -1,7 +1,7 @@
 // netlify/functions/dashboard.js
 // API key dashboard and management
 
-const db = require('../../dev-scripts/database');
+const db = require('../../config/database');
 
 exports.handler = async (event, context) => {
   const headers = {
