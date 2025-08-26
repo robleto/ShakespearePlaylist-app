@@ -4,14 +4,7 @@
 
 For Neon, your DATABASE_URL should follow this format:
 
-```
-postgres://username:password@hostname/database?sslmode=require
-```
 
-Example:
-```
-postgres://alex:p4ssw0rd@ep-cool-tree-123456.us-east-2.aws.neon.tech/gameawards?sslmode=require
-```
 
 ## Components:
 
