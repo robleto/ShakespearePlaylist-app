@@ -1,3 +1,5 @@
+const db = require('../../dev-scripts/database');
+
 exports.handler = async (event, context) => {
   const headers = {
     'Access-Control-Allow-Origin': '*',
@@ -14,13 +16,41 @@ exports.handler = async (event, context) => {
     };
   }
 
-  return {
-    statusCode: 200,
-    headers,
-    body: JSON.stringify({
-      status: 'OK',
-      timestamp: new Date().toISOString(),
-      message: 'Game Awards API is running on Netlify Functions'
-    })
-  };
+  try {
+    // Check database connectivity
+    const dbHealth = await db.healthCheck();
+
+    // Attempt to load build metadata if present
+    let buildInfo = null;
+    try {
+      buildInfo = require('../../build-info.json');
+    } catch(_) {}
+
+    return {
+      statusCode: 200,
+      headers,
+      body: JSON.stringify({
+        status: 'OK',
+        timestamp: new Date().toISOString(),
+        message: 'Game Awards API is running on Netlify Functions with Neon database',
+        database: {
+          status: 'connected',
+          timestamp: dbHealth.timestamp
+        },
+        build: buildInfo || null
+      })
+    };
+  } catch (error) {
+    console.error('Health check failed:', error);
+    return {
+      statusCode: 503,
+      headers,
+      body: JSON.stringify({
+        status: 'ERROR',
+        timestamp: new Date().toISOString(),
+        message: 'Database connection failed',
+        error: error.message
+      })
+    };
+  }
 };

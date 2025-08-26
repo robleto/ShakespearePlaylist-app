@@ -1,14 +1,8 @@
-const { createClient } = require('@supabase/supabase-js');
-
-// Initialize Supabase client
-const supabase = createClient(
-  process.env.SUPABASE_URL,
-  process.env.SUPABASE_ANON_KEY
-);
+const db = require('../../dev-scripts/database');
 
 // Load awards data (for now, still using JSON file)
-// In production, this would come from Supabase
-const awardsData = require('../../data/awards-data');
+// In production, this would come from the database
+const awardsData = require('../../dev-scripts/awards-data');
 
 exports.handler = async (event, context) => {
   // Enable CORS
@@ -56,6 +50,39 @@ exports.handler = async (event, context) => {
       };
     }
 
+    // Validate API key if provided
+    if (apikey && apikey !== 'demo') {
+      try {
+        const validation = await db.validateApiKey(apikey);
+        if (!validation.valid) {
+          return {
+            statusCode: 429,
+            headers,
+            body: JSON.stringify({
+              Response: "False",
+              Error: validation.error || "API key validation failed",
+              RemainingRequests: validation.requests_remaining_today || 0,
+              MonthlyLimit: validation.monthly_limit || 1000
+            })
+          };
+        }
+        // Add usage info to response headers
+        headers['X-RateLimit-Remaining-Daily'] = validation.requests_remaining_today || 0;
+        headers['X-RateLimit-Remaining-Monthly'] = validation.requests_remaining_month || 0;
+        headers['X-RateLimit-Tier'] = validation.tier || 'free';
+      } catch (e) {
+        console.error('API key validation error:', e);
+        return {
+          statusCode: 500,
+          headers,
+          body: JSON.stringify({
+            Response: "False",
+            Error: "API key validation failed"
+          })
+        };
+      }
+    }
+
     let result;
 
     if (search) {
@@ -77,9 +104,13 @@ exports.handler = async (event, context) => {
       };
     }
 
-    // TODO: Log API usage to Supabase
+    // Log API usage to Neon
     if (apikey && apikey !== 'demo') {
-      await logApiUsage(apikey, event.path, query);
+      try {
+        await db.logApiUsage(apikey, event.path, query);
+      } catch (e) {
+        console.error('Failed to log API usage to Neon:', e);
+      }
     }
 
     return {
@@ -227,21 +258,11 @@ function searchAwards(searchTerm, filters = {}) {
   };
 }
 
-// Log API usage to Supabase
+// Log API usage wrapper (uses Neon db helper)
 async function logApiUsage(apiKey, endpoint, params) {
   try {
-    await supabase
-      .from('api_usage')
-      .insert([
-        {
-          api_key: apiKey,
-          endpoint: endpoint,
-          parameters: params,
-          timestamp: new Date().toISOString(),
-          ip_address: 'unknown' // Netlify doesn't provide client IP in functions easily
-        }
-      ]);
+    await db.logApiUsage(apiKey, endpoint, params, null, 200, 'unknown', 'netlify-function');
   } catch (error) {
-    console.error('Failed to log API usage:', error);
+    console.error('Failed to log API usage via db helper:', error);
   }
 }

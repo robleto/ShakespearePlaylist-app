@@ -1,9 +1,4 @@
-const { createClient } = require('@supabase/supabase-js');
-
-const supabase = createClient(
-  process.env.SUPABASE_URL,
-  process.env.SUPABASE_ANON_KEY
-);
+const db = require('../../dev-scripts/database');
 
 exports.handler = async (event, context) => {
   const headers = {
@@ -56,23 +51,16 @@ exports.handler = async (event, context) => {
         };
       }
 
-      // Call Supabase function to generate API key
-      const { data, error } = await supabase.rpc('generate_api_key', {
-        user_email: email,
-        user_name: name,
-        user_company: company,
-        user_use_case: use_case,
-        user_description: description
-      });
+      // Call database function to generate API key
+      const result = await db.generateApiKey(email, name, company, use_case, description);
 
-      if (error) {
-        console.error('Supabase error:', error);
+      if (!result.success) {
         return {
           statusCode: 500,
           headers,
           body: JSON.stringify({
             success: false,
-            error: 'Failed to generate API key'
+            error: result.error || 'Failed to generate API key'
           })
         };
       }
@@ -80,7 +68,7 @@ exports.handler = async (event, context) => {
       return {
         statusCode: 200,
         headers,
-        body: JSON.stringify(data)
+        body: JSON.stringify(result)
       };
 
     } catch (error) {

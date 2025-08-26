@@ -1,3 +1,4 @@
+build-info.json
 node_modules/
 .env
 .env.local
@@ -25,3 +26,17 @@ coverage/
 # API keys and secrets
 *.pem
 *.key
+
+# Development and archive folders
+dev-scripts/
+docs-archive/
+database-archive/
+
+# Build artifacts
+build-info.json
+
+# IDE and system files
+.idea/
+*.swp
+*.swo
+*~

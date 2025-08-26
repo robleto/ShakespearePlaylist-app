@@ -1,55 +1,66 @@
 # Game Awards API
 
-A RESTful API for board game awards data, similar to OMDB API but focused on board games. Access comprehensive award info## 🚀 Deployment
+A RESTful API for board game awards data (an OMDB-style service for tabletop). Query 5,995 awards covering 7,079 games, 1,101 award sets, 499 categories across 52 years.
 
-### Netlify + Supabase (Recommended)
-
-This project is configured for deployment on Netlify with Supabase as the database:
-
-```bash
-# 1. Push to GitHub
 git add .
 git commit -m "Deploy Game Awards API"
 git push origin main
+## 🚀 Deployment & Operations
 
-# 2. Connect to Netlify
-# - Import from GitHub
-# - Set build command: npm run build
-# - Set environment variables (see NETLIFY-DEPLOYMENT.md)
+Production reference stack: Netlify (Functions + static) + Neon (Postgres) + Stripe (subscriptions). A single authoritative guide now lives in `DEPLOYMENT.md` (includes environment variables, build metadata, webhook setup, and migration notes).
 
-# 3. Set up Supabase
-# - Create new project
-# - Run SQL schema from supabase/schema.sql
-# - Add environment variables to Netlify
+Fast path:
+```bash
+# Commit & push
+git add . && git commit -m "Deploy" && git push origin main
+
+# Netlify (UI)
+#  - Build command: npm run build
+#  - Functions dir: netlify/functions
+#  - Publish dir: public
+#  - Add env vars (see DEPLOYMENT.md section 2)
+
+# Neon
+#  - Create project, run neon/schema.sql, copy DATABASE_URL (?sslmode=require)
+
+# Stripe (test mode)
+node setup-stripe-products.js   # creates products, prices, webhook, prints env vars
 ```
 
-See [NETLIFY-DEPLOYMENT.md](NETLIFY-DEPLOYMENT.md) for detailed instructions.
+Migration from Supabase? See the "Migration & Legacy Notes" section inside `DEPLOYMENT.md` (Supabase env removal + Neon connection format) – prior separate docs were consolidated.
 
 ### Local Development
 
 ```bash
 npm install
-npm run dev  # Runs with nodemon for auto-restart
+npm run dev  # nodemon auto-restart (Express)
 
-# Or test Netlify functions locally
+# Or test Netlify functions + static site locally
 netlify dev
-```r gaming awards like Spiel des Jahres, Origins Awards, Diana Jones Award, and many more.
+```
 
-## 🚀 Quick Start
+The dataset includes major awards like Spiel des Jahres, Origins Awards, Diana Jones Award, and many more.
 
-### Installation
+## ⚡ Quick Start (Local)
 
 ```bash
 npm install
-npm start
+npm run dev          # Express + auto-reload
+# or test serverless functions directly
+node local-functions-server.js &
+node scripts/run-function.js api "s=wingspan&apikey=demo"
 ```
 
-The API will be available at `http://localhost:3000`
-
-### Development
-
+Stripe test bootstrap (optional now, required before subscriptions):
 ```bash
-npm run dev  # Runs with nodemon for auto-restart
+cp .env.example .env   # fill DATABASE_URL + Stripe keys
+node setup-stripe-products.js
+# add printed price + webhook secrets to Netlify env and redeploy
+```
+
+Health & build metadata:
+```bash
+curl http://localhost:4000/.netlify/functions/health
 ```
 
 ## 📋 API Endpoints
@@ -158,46 +169,43 @@ Each award object contains:
 
 ## 🏗️ Architecture
 
-- **Node.js + Express** - Fast, lightweight API server
-- **In-memory data** - Lightning-fast responses (< 100ms)
-- **Rate limiting** - Built-in protection against abuse
-- **CORS enabled** - Ready for browser integration
-- **Helmet security** - Production-ready security headers
+- **Netlify Functions + Express fallback** – Serverless first, local dev convenience
+- **Neon PostgreSQL** – Users, API keys, usage, (soon) award search
+- **In-memory dataset (current search)** – Pending SQL-backed search flag (`USE_DB=1`)
+- **Rate limiting & usage tracking** – PL/pgSQL (`validate_api_key_enhanced`) sets remaining quota headers
+- **Build metadata** – `build-info.json` surfaced via `/health`
 
 ## 🔐 Security & Rate Limiting
 
-- Rate limiting: 100 requests per 15 minutes (configurable)
-- CORS enabled for cross-origin requests
-- Helmet.js for security headers
-- API key validation in production
+- Tiered daily/monthly quotas (Free / Professional / Enterprise)
+- API key validation + suspension logic (Stripe payment_failed events)
+- CORS (`*` default – tighten if embedding in browsers)
+- Helmet security headers via Express fallback
+- Planned: peppered key hashing (`API_KEY_SECRET`), narrower CORS
 
-## 📈 Deployment
+## 📈 Key Environment Variables (excerpt)
 
-### Environment Variables
-
-```bash
-NODE_ENV=production
-PORT=3000
-DEFAULT_API_KEY=your-production-key
+See full matrix in `DEPLOYMENT.md`.
+```env
+DATABASE_URL=postgresql://...?...sslmode=require
+STRIPE_SECRET_KEY=sk_test_...
+STRIPE_PUBLISHABLE_KEY=pk_test_...
+STRIPE_WEBHOOK_SECRET=whsec_...
 REQUIRE_API_KEY=true
+DEPLOY_ENV=production
 ```
-
-### Docker (Coming Soon)
-
-```bash
-docker build -t game-awards-api .
-docker run -p 3000:3000 game-awards-api
-```
+Optional overrides: `RATE_LIMIT_WINDOW_MS`, `RATE_LIMIT_MAX_REQUESTS` (Express path), `USE_DB=1` (future search switch).
 
 ## 🤝 Contributing
 
 We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for details.
 
-### Adding New Awards
+### Adding / Updating Awards Data
 
-1. Update the `enhanced-honors-complete.json` file
-2. Ensure data follows the existing schema
-3. Test locally before submitting PR
+Current search layer reads from `enhanced-honors-complete.json`. Upcoming migration will populate a relational awards table; until then:
+1. Edit `enhanced-honors-complete.json`
+2. Run a few representative queries (`npm run query -- "s=wingspan"`)
+3. Open PR with rationale + source links
 
 ## 📝 License
 
@@ -217,4 +225,4 @@ MIT License - see [LICENSE](LICENSE) file for details.
 
 ---
 
-**🎲 Game Awards API** - Bringing board game award data to developers worldwide.
+**🎲 Game Awards API** – Bringing board game award data to developers worldwide. See `BUSINESS-STRATEGY.md` for market & roadmap.
