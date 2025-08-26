@@ -319,3 +319,51 @@ For major changes, please open an issue first to discuss.
 ---
 
 **Built with ❤️ for the Shakespeare theater community**
+
+## 🗂 Route Structure & Layout Strategy
+
+This project uses Next.js App Router route groups (folder names in parentheses) to separate concerns without affecting URLs:
+
+```
+app/
+  (site)/               # Public site pages (these map directly to /companies, /plays, /productions, etc.)
+    layout.tsx          # Public shell: Header/Footer, metadata, skip link
+    companies/
+    plays/
+    productions/
+  (admin)/              # Admin area grouping (auth‑protected)
+    layout.tsx          # Auth gate + minimal wrapper
+    admin/              # Actual URL segment /admin/*
+      layout.tsx        # Admin shell (nav, spacing)
+      page.tsx          # /admin (review queue)
+      sources/page.tsx  # /admin/sources (source status)
+  admin/ (legacy)       # Older admin implementation (can be consolidated later)
+```
+
+Why route groups:
+- Provide separate layout shells (public vs admin) without nesting extra path segments.
+- Allow future groups (e.g., `(auth)` for login flows or `(marketing)` for landing pages) while keeping clean URLs.
+- Enable incremental refactors (you can stage a new group alongside an old one, then retire the old code).
+
+Public Layout Enhancements:
+- Exports `metadata` for SEO & social cards.
+- Adds an accessible skip link and proper `<main id="site-main">` landmark.
+
+Admin Group Scaffold:
+- `(admin)/layout.tsx` performs role check (`ADMIN`) and redirects unauthenticated users.
+- Inner `admin/layout.tsx` provides navigation and page chrome.
+- Pages under `admin/` fetch data server-side (e.g., review queue, sources).
+
+Refactor Notes:
+- Legacy duplicate pages at `app/companies`, `app/plays`, `app/productions` were removed in favor of `(site)` versions.
+- When confident, you can migrate any remaining older admin pages into the grouped structure and delete the legacy `app/admin` folder.
+
+To add a new public page:
+1. Create `app/(site)/<segment>/page.tsx`.
+2. The URL will be `/<segment>` automatically.
+3. Shared Header/Footer applied via `(site)/layout.tsx`.
+
+To add a new admin tool page:
+1. Add file under `app/(admin)/admin/<tool>/page.tsx`.
+2. It becomes available at `/admin/<tool>` with auth + admin shell.
+

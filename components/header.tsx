@@ -11,11 +11,14 @@ export function Header() {
           </Link>
 
           <nav className="hidden md:flex space-x-8">
-            <Link href="/productions" className="text-gray-600 hover:text-gray-900">
-              Browse
+            <Link href="/plays" className="text-gray-600 hover:text-gray-900">
+              Plays
             </Link>
             <Link href="/companies" className="text-gray-600 hover:text-gray-900">
               Companies
+            </Link>
+            <Link href="/productions" className="text-gray-600 hover:text-gray-900">
+              Productions
             </Link>
             <Link href="/api" className="text-gray-600 hover:text-gray-900">
               API

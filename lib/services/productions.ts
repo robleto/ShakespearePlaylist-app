@@ -248,3 +248,47 @@ export async function searchProductions(
     hasMore,
   }
 }
+
+// "What's playing where" – group upcoming published productions by company
+export async function getUpcomingProductionsGroupedByCompany() {
+  const today = new Date()
+  const productions = await prisma.production.findMany({
+    where: {
+      status: 'PUBLISHED',
+      endDate: { gte: today },
+    },
+    include: { company: true, venue: true },
+    orderBy: [{ company: { name: 'asc' } }, { startDate: 'asc' }],
+  }) as ProductionWithRelations[]
+
+  const grouped: Record<string, { company: Company; productions: ProductionWithRelations[] }> = {}
+  for (const p of productions) {
+    if (!grouped[p.companyId]) {
+      grouped[p.companyId] = { company: p.company, productions: [] }
+    }
+    grouped[p.companyId].productions.push(p)
+  }
+  return Object.values(grouped)
+}
+
+// "Where's playing what" – counts of upcoming productions per play
+export async function getUpcomingPlayCounts() {
+  const today = new Date()
+  const counts = await prisma.production.groupBy({
+    by: ['canonicalPlay'],
+    where: { status: 'PUBLISHED', endDate: { gte: today } },
+    _count: { _all: true },
+  })
+  // Sort in JS since Prisma aggregation orderBy on _all may not be supported
+  return counts.sort((a, b) => (b._count._all - a._count._all))
+}
+
+// Productions for a single play (upcoming)
+export async function getUpcomingProductionsByPlay(play: string) {
+  const today = new Date()
+  return prisma.production.findMany({
+  where: { status: 'PUBLISHED', canonicalPlay: play as any, endDate: { gte: today } },
+    include: { company: true, venue: true },
+    orderBy: { startDate: 'asc' },
+  }) as Promise<ProductionWithRelations[]>
+}

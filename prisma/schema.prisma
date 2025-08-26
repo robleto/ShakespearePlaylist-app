@@ -26,6 +26,16 @@ enum ProductionStatus {
   ARCHIVED
 }
 
+// High-level categorization for canonical plays
+enum PlayCategory {
+  COMEDY
+  TRAGEDY
+  HISTORY
+  ROMANCE
+  LATE
+  OTHER
+}
+
 enum CanonicalPlay {
   ALL_S_WELL_THAT_ENDS_WELL
   ANTONY_AND_CLEOPATRA
@@ -131,6 +141,8 @@ model Company {
   country   String   @default("US")
   lat       Float?
   lng       Float?
+  // Human-friendly slug for public routes. Will be backfilled via script.
+  slug      String?  @unique
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -221,6 +233,21 @@ model RawPage {
   source Source @relation(fields: [sourceId], references: [id])
 
   @@map("raw_pages")
+}
+
+model Play {
+  id            String         @id @default(cuid())
+  canonicalPlay CanonicalPlay  @unique
+  slug          String         @unique
+  title         String
+  abbrev        String?
+  categories    PlayCategory[]
+  altTitles     String[]      @default([])
+  isApocrypha   Boolean        @default(false)
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+
+  @@map("plays")
 }
 
 model Alias {

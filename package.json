@@ -11,6 +11,8 @@
     "migrate": "prisma migrate deploy",
     "seed": "prisma db seed",
     "scrape": "tsx scripts/scrape.ts",
+  "ingest:companies": "tsx scripts/ingestCompaniesFromNotion.ts",
+  "ingest-and-scrape": "tsx scripts/ingestAndScrape.ts",
     "test": "vitest",
     "prepare": "husky install"
   },

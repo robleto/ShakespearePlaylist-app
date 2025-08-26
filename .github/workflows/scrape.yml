@@ -9,9 +9,9 @@ jobs:
   scrape:
     runs-on: ubuntu-latest
     # Job-level secrets (configure these in the repository settings)
-    env:
-      DATABASE_URL: ${{ secrets.DATABASE_URL }}
-      NEXTAUTH_SECRET: ${{ secrets.NEXTAUTH_SECRET }}
+    #env:
+    #  DATABASE_URL: 
+    #  NEXTAUTH_SECRET: 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
