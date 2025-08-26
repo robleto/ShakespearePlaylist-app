@@ -3,6 +3,7 @@ import { scrapeASC } from '../lib/scraping/adapters/americanshakespearecenter.co
 import { scrapeOSF } from '../lib/scraping/adapters/osfashland.org'
 import { scrapeSTC } from '../lib/scraping/adapters/shakespearetheatre.org'
 import { scrapeUSF } from '../lib/scraping/adapters/bard.org'
+import { scrapeGuthrieOrg } from '../lib/scraping/adapters/guthrie.org'
 import { getAllSources, updateSourceStatus } from '../lib/services/sources'
 import { createOrUpdateProduction } from '../lib/services/productions'
 import type { NormalizedEvent } from '../lib/normalization/normalize'
@@ -14,6 +15,7 @@ const SCRAPERS = {
   'osfashland.org': scrapeOSF,
   'shakespearetheatre.org': scrapeSTC,
   'bard.org': scrapeUSF,
+  'guthrie.org': scrapeGuthrieOrg,
 }
 
 async function main() {
