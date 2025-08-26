@@ -86,9 +86,6 @@ async function runTests() {
   
   await testWebhook(paymentSucceededEvent, 'Payment Succeeded (should restore API key)');
   
-  console.log('\n✨ Webhook tests complete!');
-  console.log('\n🔍 Next: Test API key after suspension/restoration:');
-  console.log('curl "http://localhost:4000/.netlify/functions/api?s=wingspan&apikey=gaa_7sUx7XQeSrNu4PhsQ5gvZiyVsaDNhVzF"');
 }
 
 runTests();
