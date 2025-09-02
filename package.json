@@ -30,7 +30,7 @@
     "gaming"
   ],
   "author": "Greg Robleto",
-  "license": "MIT",
+  "license": "Commercial",
   "dependencies": {
     "@neondatabase/serverless": "^0.9.5",
     "axios": "^1.11.0",

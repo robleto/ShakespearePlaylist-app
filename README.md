@@ -2,29 +2,18 @@
 
 A RESTful API for board game awards data (an OMDB-style service for tabletop). Public sample ships with a limited subset; a larger private dataset (non-redistributable) can be mounted under `internal/`.
 
-git add .
-git commit -m "Deploy Game Awards API"
-git push origin main
+> Commercial deployment asset. Not an open contribution project.
 ## 🚀 Deployment & Operations
 
-Production reference stack: Netlify (Functions + static) + Neon (Postgres) + Stripe (subscriptions). A single authoritative guide now lives in `DEPLOYMENT.md` (includes environment variables, build metadata, webhook setup, and migration notes).
+Production reference stack: Netlify (Functions + static) + Neon (Postgres) + Stripe (subscriptions). Detailed deployment, Neon, Stripe, and quick start guides now live under `docs/technical/`.
 
 Fast path:
 ```bash
-# Commit & push
-git add . && git commit -m "Deploy" && git push origin main
-
-# Netlify (UI)
-#  - Build command: npm run build
-#  - Functions dir: netlify/functions
-#  - Publish dir: public
-#  - Add env vars (see DEPLOYMENT.md section 2)
-
-# Neon
-#  - Create project, run neon/schema.sql, copy DATABASE_URL (?sslmode=require)
-
-# Stripe (test mode)
-node setup-stripe-products.js   # creates products, prices, webhook, prints env vars
+Netlify UI basics:
+  Build command: npm run build
+  Functions dir: netlify/functions
+  Publish dir: public
+  Add required env vars (`DATABASE_URL`, Stripe keys, etc.)
 ```
 
 Migration from Supabase? See the "Migration & Legacy Notes" section inside `DEPLOYMENT.md` (Supabase env removal + Neon connection format) – prior separate docs were consolidated.
@@ -185,7 +174,7 @@ Each award object contains:
 
 ## 📈 Key Environment Variables (excerpt)
 
-See full matrix in `DEPLOYMENT.md`.
+See full matrix in `docs/technical/DEPLOYMENT.md` (populate for buyer handoff).
 ```env
 DATABASE_URL=postgresql://...?...sslmode=require
 STRIPE_SECRET_KEY=sk_test_...
@@ -196,11 +185,23 @@ DEPLOY_ENV=production
 ```
 Optional overrides: `RATE_LIMIT_WINDOW_MS`, `RATE_LIMIT_MAX_REQUESTS` (Express path), `USE_DB=1` (future search switch).
 
-## 🤝 Contributing
+## 🛡️ Commercial Usage & Licensing
 
-We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for details.
+This repository is distributed under a custom commercial license (`LICENSE-COMMERCIAL.md`). It is intended as a deployable asset you can run for your own product or internal tooling. Public redistribution of the full codebase or bulk dataset is prohibited.
 
-### Adding / Updating Awards Data
+Permitted:
+- Deploy and operate the API for your users
+- Modify code internally
+- Extend subscription tiers / pricing logic
+
+Not Permitted:
+- Publishing the full repo publicly
+- Reselling the raw dataset or bulk exports as a standalone product
+- Open‑sourcing the private full dataset
+
+Need broader rights (OEM / white‑label)? Email sales@gameawardsapi.com.
+
+### Managing the Private Dataset
 
 Current search layer reads from `lib/awards-data.js`, which attempts to load a private full dataset at `internal/enhanced-honors-complete.json` (gitignored). The repo includes a minimal `data/sample-awards.json` for development & demonstrations.
 
@@ -209,11 +210,11 @@ To use a full dataset privately:
 2. Restart local dev (`npm run dev` or `netlify dev`)
 3. The loader will detect and use it automatically (log line: "Loaded full private dataset").
 
-Please do NOT submit PRs containing proprietary or third‑party dataset dumps. Schema/structure improvements are welcome.
+Do NOT redistribute proprietary or third‑party dataset dumps. Keep the full dataset private under `internal/`.
 
 ## 📝 License
 
-MIT License - see [LICENSE](LICENSE) file for details.
+See `LICENSE-COMMERCIAL.md`.
 
 ## 🙏 Acknowledgments
 

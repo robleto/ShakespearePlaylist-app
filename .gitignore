@@ -32,6 +32,7 @@ dev-scripts/
 docs-archive/
 database-archive/
 internal/
+docs/business/
 
 # Build artifacts
 build-info.json
