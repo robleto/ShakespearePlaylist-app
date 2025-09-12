@@ -70,11 +70,11 @@ async function probeHost(host: string, timeoutMs = 5000) {
   const id = setTimeout(() => ac.abort(), timeoutMs)
   try {
     // Try HEAD first
-    const r = await fetch(url, { method: 'HEAD', signal: ac.signal, redirect: 'follow', headers: { 'User-Agent': 'ShakesFindBot/1.0 (+https://shakesfind.com)' } })
+  const r = await fetch(url, { method: 'HEAD', signal: ac.signal, redirect: 'follow', headers: { 'User-Agent': 'ShakespearePlaylistBot/1.0 (+https://shakespeareplaylist.com)' } })
     clearTimeout(id)
     if (r.ok) return url
     // Some servers don't accept HEAD - try GET
-    const r2 = await fetch(url, { method: 'GET', signal: ac.signal, redirect: 'follow', headers: { 'User-Agent': 'ShakesFindBot/1.0 (+https://shakesfind.com)' } })
+  const r2 = await fetch(url, { method: 'GET', signal: ac.signal, redirect: 'follow', headers: { 'User-Agent': 'ShakespearePlaylistBot/1.0 (+https://shakespeareplaylist.com)' } })
     clearTimeout(id)
     if (r2.ok) return url
     return null

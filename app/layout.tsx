@@ -6,7 +6,7 @@ import { Providers } from './providers'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'ShakesFind | Discover Shakespeare Productions',
+  title: 'ShakespearePlaylist | Discover Shakespeare Productions',
   description: 'Find upcoming Shakespeare productions from theaters across the United States',
   keywords: ['Shakespeare', 'theater', 'productions', 'events', 'performances'],
 }

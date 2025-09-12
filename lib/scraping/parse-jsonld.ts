@@ -162,7 +162,7 @@ export function normalizeJSONLDEvents(
       priceMin,
       priceMax,
       notes: notes.length > 0 ? notes.join(' | ') : undefined,
-      sourceConfidence: Math.min(confidence, sourceConfidence),
+      sourceConfidence: confidence, // use detected confidence directly
     }
   })
 }

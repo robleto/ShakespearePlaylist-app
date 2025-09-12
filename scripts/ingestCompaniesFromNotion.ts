@@ -19,7 +19,7 @@ async function main() {
   let html: string
   if (/^https?:/i.test(notionUrl)) {
   if (!quiet) console.log(`🔎 Fetching Notion page: ${notionUrl}`)
-    const res = await fetch(notionUrl, { headers: { 'User-Agent': 'ShakesFindBot/1.0 (+https://shakesfind.com)' } })
+  const res = await fetch(notionUrl, { headers: { 'User-Agent': 'ShakespearePlaylistBot/1.0 (+https://shakespeareplaylist.com)' } })
     if (!res.ok) throw new Error(`Failed to fetch Notion page: ${res.status}`)
     html = await res.text()
   } else {

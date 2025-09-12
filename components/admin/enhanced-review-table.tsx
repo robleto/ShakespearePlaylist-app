@@ -110,10 +110,10 @@ export function EnhancedReviewTable({ productions }: EnhancedReviewTableProps) {
 
             return (
               <tr key={production.id} className="hover:bg-gray-50">
-                <td className="px-6 py-4">
+                <td className="px-4 py-3 align-top">
                   <div>
-                    <div className="text-sm font-medium text-gray-900 mb-1">
-                      {production.titleRaw}
+                    <div className="text-sm font-medium text-gray-900 mb-1 max-w-xs">
+                      <Expandable text={production.titleRaw} />
                     </div>
                     <div className="text-sm text-blue-600 font-medium">
                       {playTitle}
@@ -125,7 +125,7 @@ export function EnhancedReviewTable({ productions }: EnhancedReviewTableProps) {
                     )}
                   </div>
                 </td>
-                <td className="px-6 py-4">
+                <td className="px-4 py-3 align-top">
                   <div>
                     <div className="text-sm font-medium text-gray-900">
                       {production.company.name}
@@ -151,10 +151,10 @@ export function EnhancedReviewTable({ productions }: EnhancedReviewTableProps) {
                     </div>
                   </div>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900 align-top">
                   {dateRange}
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap">
+                <td className="px-4 py-3 whitespace-nowrap align-top">
                   <div className="space-y-2">
                     <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusBadge(production.status)}`}>
                       {production.status}
@@ -164,8 +164,8 @@ export function EnhancedReviewTable({ productions }: EnhancedReviewTableProps) {
                     </div>
                   </div>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                  <div className="flex space-x-2">
+                <td className="px-4 py-3 whitespace-nowrap text-right text-sm font-medium align-top">
+                  <div className="flex space-x-2 justify-end">
                     {production.status === 'REVIEW' && (
                       <button
                         onClick={() => handleApprove(production.id)}
@@ -196,6 +196,29 @@ export function EnhancedReviewTable({ productions }: EnhancedReviewTableProps) {
         <div className="text-center py-12">
           <div className="text-gray-500">No productions found</div>
         </div>
+      )}
+    </div>
+  )
+}
+
+// Small expandable text component to clamp tall HTML-ish blobs
+function Expandable({ text }: { text: string }) {
+  const [open, setOpen] = useState(false)
+  const plain = (text || '').replace(/\s+/g,' ').trim()
+  if (!plain) return null
+  const tooLong = plain.length > 160 || plain.split(' ').length > 25
+  const display = !open && tooLong ? plain.slice(0, 150) + '…' : plain
+  return (
+    <div className="group relative">
+      <span className={!open && tooLong ? 'line-clamp-2' : ''}>{display}</span>
+      {tooLong && (
+        <button
+          type="button"
+          onClick={() => setOpen(o=>!o)}
+          className="ml-2 text-[10px] uppercase tracking-wide text-indigo-600 hover:underline"
+        >
+          {open ? 'Collapse' : 'Expand'}
+        </button>
       )}
     </div>
   )

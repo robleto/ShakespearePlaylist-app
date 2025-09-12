@@ -25,7 +25,7 @@ export interface FetchResult {
   error?: string
 }
 
-const DEFAULT_USER_AGENT = 'ShakesFindBot/0.1 (contact: admin@shakesfind.com)'
+const DEFAULT_USER_AGENT = 'ShakespearePlaylistBot/0.1 (contact: admin@shakespeareplaylist.com)'
 
 export async function fetchWithPoliteness(
   url: string,

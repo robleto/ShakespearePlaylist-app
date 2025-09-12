@@ -4,19 +4,19 @@ import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
   title: {
-    default: 'ShakesFind – Discover Shakespeare Productions',
-    template: '%s • ShakesFind'
+  default: 'ShakespearePlaylist – Discover Shakespeare Productions',
+  template: '%s • ShakespearePlaylist'
   },
   description: 'Browse upcoming Shakespeare productions, companies, and plays.',
   icons: [{ rel: 'icon', url: '/favicon.ico' }],
   openGraph: {
-    title: 'ShakesFind',
+  title: 'ShakespearePlaylist',
     description: 'Discover and track upcoming Shakespeare productions across theaters.',
     type: 'website'
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'ShakesFind',
+  title: 'ShakespearePlaylist',
     description: 'Discover upcoming Shakespeare productions.'
   }
 }

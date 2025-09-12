@@ -97,7 +97,7 @@ export default async function HomePage({
         {productions.length === 0 && !searchParams.q && (
           <div className="text-center py-12">
             <h3 className="text-lg font-medium text-gray-900 mb-2">
-              Welcome to ShakesFind
+              Welcome to ShakespearePlaylist
             </h3>
             <p className="text-gray-500 mb-4">
               Start searching to discover Shakespeare productions near you.

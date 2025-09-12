@@ -136,6 +136,8 @@ model Company {
   id        String   @id @default(uuid())
   name      String
   website   String
+  // Optional: primary page containing current season / production listings for targeted scraping
+  listingsPageUrl String?
   city      String
   region    String
   country   String   @default("US")

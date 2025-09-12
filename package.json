@@ -1,5 +1,5 @@
 {
-  "name": "shakesfind",
+  "name": "shakespeareplaylist",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -13,6 +13,11 @@
     "scrape": "tsx scripts/scrape.ts",
   "ingest:companies": "tsx scripts/ingestCompaniesFromNotion.ts",
   "ingest-and-scrape": "tsx scripts/ingestAndScrape.ts",
+  "cleanup:productions": "tsx scripts/cleanupProductions.ts",
+  "audit:productions": "tsx scripts/auditProductions.ts",
+  "audit:scraping": "tsx scripts/auditScraping.ts",
+  "cleanup:retro": "tsx scripts/retroCleanupProductions.ts",
+  "archive:retro": "tsx scripts/retroArchiveProductions.ts",
     "test": "vitest",
     "prepare": "husky install"
   },

@@ -1,6 +1,8 @@
-# ShakesFind 🎭
+# ShakespearePlaylist 🎭
 
-A production-ready MVP that continuously discovers and normalizes upcoming Shakespeare productions from multiple theater websites into a Neon Postgres database, exposes a simple API, and publishes a Next.js site on Netlify.
+A production-ready MVP (formerly ShakesFind) that continuously discovers and normalizes upcoming Shakespeare productions from multiple theater websites into a Neon Postgres database, exposes a simple API, and publishes a Next.js site on Netlify.
+
+> Project renamed to **ShakespearePlaylist**. Previous user-agent `ShakesFindBot/0.1` is now `ShakespearePlaylistBot/0.1` and default notification email domain updated.
 
 ## 🚀 Features
 
@@ -56,7 +58,7 @@ A production-ready MVP that continuously discovers and normalizes upcoming Shake
 ### 1. Clone and Install
 ```bash
 git clone <repository-url>
-cd ShakesFind
+cd ShakespearePlaylist
 pnpm install
 ```
 
@@ -70,7 +72,7 @@ Edit `.env.local` with your configuration:
 # Required
 DATABASE_URL="postgresql://user:password@your-neon-url/database"
 NEXTAUTH_SECRET="your-secure-random-string"
-NEXTAUTH_URL="http://localhost:3000"
+NEXTAUTH_URL="http://localhost:3001"
 ADMIN_EMAIL="your-email@example.com"
 
 # Optional
@@ -102,7 +104,7 @@ pnpm scrape
 pnpm test
 ```
 
-Visit `http://localhost:3000` to see the site.
+Visit `http://localhost:3001` to see the site (export PORT=3001 before starting dev, or set in your .env.local).
 
 ## 🌐 Deployment
 
@@ -267,7 +269,7 @@ Structured console logging with error tracking. Production logs available in Net
 
 - **Robots.txt**: Automatically checked before crawling
 - **Rate Limiting**: Configurable delays between requests
-- **User-Agent**: Identifies as "ShakesFindBot/0.1"
+- **User-Agent**: Identifies as "ShakespearePlaylistBot/0.1" (update robots rules accordingly)
 - **Attribution**: Links back to original box office pages
 - **Opt-out**: Easy disable mechanism for theater operators
 
@@ -313,7 +315,7 @@ For major changes, please open an issue first to discuss.
 ## 📞 Support
 
 - **Issues**: GitHub Issues
-- **Email**: admin@shakesfind.com
+- **Email**: admin@shakespeareplaylist.com
 - **Docs**: This README + inline code comments
 
 ---

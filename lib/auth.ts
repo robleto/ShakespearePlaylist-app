@@ -16,11 +16,15 @@ export const authOptions: NextAuthOptions = {
           pass: process.env.EMAIL_SERVER_PASSWORD,
         },
       },
-      from: process.env.EMAIL_FROM || 'noreply@shakesfind.com',
+  from: process.env.EMAIL_FROM || 'noreply@shakespeareplaylist.com',
     }),
     GitHubProvider({
       clientId: process.env.GITHUB_ID!,
       clientSecret: process.env.GITHUB_SECRET!,
+  // Since we have a single trusted admin email, allow linking the GitHub
+  // OAuth account to the existing email user (created via Email provider)
+  // to avoid OAuthAccountNotLinked errors during first GitHub sign-in.
+  allowDangerousEmailAccountLinking: true,
     }),
   ],
   callbacks: {
@@ -44,12 +48,14 @@ export const authOptions: NextAuthOptions = {
       
       if (adminEmail && user.email === adminEmail) {
         // Ensure admin user exists in database
+        const now = new Date()
         await prisma.user.upsert({
           where: { email: user.email },
-          update: { role: 'ADMIN' },
+          update: { role: 'ADMIN', emailVerified: { set: now } },
           create: {
             email: user.email,
             role: 'ADMIN',
+            emailVerified: now,
           },
         })
         return true

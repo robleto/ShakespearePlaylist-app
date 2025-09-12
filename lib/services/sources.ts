@@ -4,7 +4,7 @@ import type { Source } from '@prisma/client'
 export async function getAllSources() {
   return prisma.source.findMany({
     include: {
-      company: true,
+  company: true, // includes listingsPageUrl if present in schema
     },
     orderBy: { lastRunAt: 'desc' },
   })

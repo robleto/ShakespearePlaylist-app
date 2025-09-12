@@ -1,5 +1,10 @@
 import { parse, isAfter, isBefore, parseISO, format } from 'date-fns'
-import { CanonicalPlay, DEFAULT_ALIASES, type PlayAlias } from './plays'
+import { CanonicalPlay, DEFAULT_ALIASES, PLAY_TITLES, type PlayAlias } from './plays'
+
+// Very common stopwords we don't want to overweight in fuzzy overlap
+const STOPWORDS = new Set([
+  'the','of','a','an','and','to','for','with','in','on','by','from','be','being','is','are','it','at','as'
+])
 
 export interface NormalizedEvent {
   titleRaw: string
@@ -54,6 +59,43 @@ export function normalizeTitle(
   if (title.includes('tempest')) {
     return { play: CanonicalPlay.TEMPEST, confidence: 0.8 }
   }
+
+  // Attempt fuzzy matching against every canonical title (excluding OTHER)
+  // Strategy: strip non-alphanumerics from both, check for containment or significant token overlap
+  const normalized = title.replace(/[^a-z0-9]/g, '')
+  let best: { play: CanonicalPlay; confidence: number } | null = null
+  for (const [playKey, fullTitle] of Object.entries(PLAY_TITLES)) {
+    if (playKey === CanonicalPlay.OTHER) continue
+    const normFull = fullTitle.toLowerCase().replace(/[^a-z0-9]/g, '')
+    if (normFull.length < 5) continue
+    if (normalized.includes(normFull)) {
+      // Very strong match – full canonical title contained
+      best = { play: playKey as CanonicalPlay, confidence: 0.95 }
+      break
+    }
+    // Token overlap heuristic (stopword-aware)
+    const titleTokensArr = title.split(/[^a-z0-9]+/).filter(Boolean)
+    const titleTokens = new Set(titleTokensArr)
+    const fullTokens = fullTitle.toLowerCase().split(/[^a-z0-9]+/).filter(Boolean)
+    const fullMeaningful = fullTokens.filter(t => !STOPWORDS.has(t))
+    const overlapTokens = fullTokens.filter(t => titleTokens.has(t))
+    const overlap = overlapTokens.length
+    const meaningfulOverlap = overlapTokens.filter(t => !STOPWORDS.has(t)).length
+    // Require at least one meaningful overlapping token (or two total if title is very short)
+    if (meaningfulOverlap === 0) continue
+    // Compute ratios using meaningful tokens to avoid "the/of" inflation
+    const overlapRatio = meaningfulOverlap / Math.max(1, fullMeaningful.length)
+    if (
+      overlapRatio >= 0.5 && // cover at least half the meaningful tokens
+      meaningfulOverlap >= Math.min(2, fullMeaningful.length) // at least 2 unless only 1 meaningful token exists
+    ) {
+      const confidence = 0.78 + Math.min(0.17, overlapRatio * 0.25) // 0.78–~0.95 bounded
+      if (!best || confidence > best.confidence) {
+        best = { play: playKey as CanonicalPlay, confidence }
+      }
+    }
+  }
+  if (best) return best
 
   // Check if it mentions "Shakespeare" to increase confidence
   const shakespeareMatch = title.includes('shakespeare')
@@ -111,7 +153,13 @@ function tryParseISO(dateStr: string): Date | null {
 }
 
 function tryParseCommonFormats(dateStr: string, currentYear: number): Date {
-  const cleanStr = dateStr.trim()
+  let cleanStr = dateStr.trim()
+  // Fix common truncation like "anuary" -> "January"
+  if (/^anuary/i.test(cleanStr)) cleanStr = 'J' + cleanStr
+  if (/^ebruary/i.test(cleanStr)) cleanStr = 'F' + cleanStr
+  if (/^arch/i.test(cleanStr)) cleanStr = 'M' + cleanStr
+  if (/^uly/i.test(cleanStr)) cleanStr = 'J' + cleanStr // July missing J
+  if (/^une/i.test(cleanStr)) cleanStr = 'J' + cleanStr // June missing J
   
   // Common patterns
   const patterns = [

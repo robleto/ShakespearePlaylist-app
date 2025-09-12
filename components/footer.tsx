@@ -4,7 +4,7 @@ export function Footer() {
       <div className="container mx-auto px-4 py-8">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div className="col-span-1 md:col-span-2">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">ShakesFind</h3>
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">ShakespearePlaylist</h3>
             <p className="text-gray-600 mb-4">
               Discover upcoming Shakespeare productions from theaters across the United States.
             </p>
@@ -57,7 +57,7 @@ export function Footer() {
 
         <div className="border-t border-gray-200 mt-8 pt-8 text-center">
           <p className="text-sm text-gray-500">
-            © {new Date().getFullYear()} ShakesFind. All rights reserved.
+            © {new Date().getFullYear()} ShakespearePlaylist. All rights reserved.
           </p>
         </div>
       </div>
