@@ -13,7 +13,12 @@ export async function generateStaticParams() {
 }
 
 export default async function CompanyDetail({ params }: { params: Params }) {
-  const company = (await prisma.company.findMany({ where: { } })).find((c:any)=> c.slug === params.slug) as any
+  const companies = await prisma.company.findMany({ where: { } })
+  let company = (companies as any[]).find((c:any)=> c.slug === params.slug) as any
+  if (!company) {
+    // fallback: allow direct id navigation if someone used /companies/<id>
+    company = (companies as any[]).find((c:any)=> c.id === params.slug)
+  }
   if (!company) return <div className="container mx-auto px-4 py-8">Company not found</div>
   const productions = await prisma.production.findMany({
     where: { companyId: company.id, status: 'PUBLISHED', endDate: { gte: new Date() } },
