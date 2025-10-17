@@ -2,24 +2,26 @@ import { prisma } from '@/lib/db'
 import { Breadcrumbs } from '@/components/breadcrumbs'
 import { PLAY_TITLES } from '@/lib/normalization/plays'
 import { formatDateRange } from '@/lib/utils/date'
+import { notFound, redirect } from 'next/navigation'
 
 interface Params { slug: string }
 
 export const dynamic = 'force-dynamic'
 
-export async function generateStaticParams() {
-  const companies = await prisma.company.findMany({})
-  return (companies as any[]).filter(c=> c.slug).map(c=> ({ slug: c.slug }))
-}
-
 export default async function CompanyDetail({ params }: { params: Params }) {
-  const companies = await prisma.company.findMany({ where: { } })
-  let company = (companies as any[]).find((c:any)=> c.slug === params.slug) as any
+  // Prefer targeted queries first
+  let company = await prisma.company.findUnique({ where: { slug: params.slug } })
+
+  // If not found, attempt lookup by primary ID (UUID string) and redirect to canonical slug if available
   if (!company) {
-    // fallback: allow direct id navigation if someone used /companies/<id>
-    company = (companies as any[]).find((c:any)=> c.id === params.slug)
+    const byId = await prisma.company.findUnique({ where: { id: params.slug } })
+    if (byId?.slug) {
+      redirect(`/companies/${byId.slug}`)
+    }
+    company = byId || null
   }
-  if (!company) return <div className="container mx-auto px-4 py-8">Company not found</div>
+
+  if (!company) return notFound()
   const productions = await prisma.production.findMany({
     where: { companyId: company.id, status: 'PUBLISHED', endDate: { gte: new Date() } },
     orderBy: { startDate: 'asc' },

@@ -1,11 +1,13 @@
 import { NextResponse } from 'next/server'
+export const dynamic = 'force-dynamic'
 import { prisma } from '@/lib/db'
 import fs from 'fs'
 import path from 'path'
 
 function safeDomain(url?: string|null) { if (!url) return undefined; try { return new URL(url).hostname.replace(/^www\./,'') } catch { return undefined } }
 
-export const revalidate = 300
+// This report should be fetched at runtime; revalidate is unnecessary when dynamic
+// export const revalidate = 300
 
 export async function GET() {
   const companies = await prisma.company.findMany({
