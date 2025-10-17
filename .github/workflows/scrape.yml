@@ -8,6 +8,11 @@ on:
 jobs:
   scrape:
     runs-on: ubuntu-latest
+    env:
+      # Configure these in repository settings → Secrets and variables → Actions
+      DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      NEXTAUTH_SECRET: ${{ secrets.NEXTAUTH_SECRET }}
+      NEXTAUTH_URL: ${{ secrets.NEXTAUTH_URL }}
     # Job-level secrets (configure these in the repository settings)
     #env:
     #  DATABASE_URL: 
