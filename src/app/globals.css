@@ -1,0 +1,39 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/*
+ * Tokens are placeholders — design files will set the final values.
+ * Cream/navy/red palette per brief; dark mode below uses ink/paper
+ * inversion as a starting point.
+ */
+@layer base {
+  :root {
+    --cream: 38 38% 92%;
+    --navy: 222 47% 18%;
+    --red: 358 68% 46%;
+    --ink: 222 47% 12%;
+    --paper: 38 38% 96%;
+
+    --font-display: 'Times New Roman', serif;
+    --font-body: ui-sans-serif, system-ui, sans-serif;
+    --font-mono: ui-monospace, 'SFMono-Regular', monospace;
+  }
+
+  .dark {
+    --cream: 222 12% 14%;
+    --paper: 222 12% 10%;
+    --ink: 38 38% 92%;
+    --navy: 38 38% 88%;
+    --red: 358 70% 56%;
+  }
+}
+
+@layer base {
+  html {
+    color-scheme: light dark;
+  }
+  body {
+    @apply bg-paper text-ink font-body antialiased;
+  }
+}
