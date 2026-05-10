@@ -1,6 +1,12 @@
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
-import { PLAYS, getPlay } from '@/lib/plays'
+import { PLAYS, getPlay, getAdjacent } from '@/lib/plays'
+import { PageRunner } from '@/components/passport/PageRunner'
+import { GenreStripe } from '@/components/passport/GenreStripe'
+import { PlayPlate } from '@/components/passport/PlayPlate'
+import { SpecBlock } from '@/components/passport/SpecBlock'
+import { AnnotQuotes } from '@/components/passport/AnnotQuotes'
+import { StampAwaiting } from '@/components/passport/Stamp'
 
 export function generateStaticParams() {
   return PLAYS.map((play) => ({ id: play.id }))
@@ -10,98 +16,132 @@ export default function PlayPage({ params }: { params: { id: string } }) {
   const play = getPlay(params.id)
   if (!play) notFound()
 
-  const runtimeHrs = Math.floor(play.approximateRuntime / 60)
-  const runtimeMin = play.approximateRuntime % 60
-  const runtimeText = runtimeHrs
-    ? `${runtimeHrs}h ${runtimeMin}m`
-    : `${runtimeMin}m`
+  const { prev, next } = getAdjacent(play.id)
+  // v1: every play renders in the unstamped state. Stamping wires up
+  // in Step 2 (usePlaybook hook + manual stamp form).
+  const mode = 'unstamped' as const
 
   return (
-    <main className="min-h-screen px-6 py-12">
-      <div className="max-w-3xl mx-auto">
-        <p className="font-mono text-xs uppercase tracking-[0.2em] text-navy/70">
-          <Link href="/" className="hover:underline underline-offset-4">
-            Cover
-          </Link>
-          <span className="mx-3">/</span>
-          <Link href="/plays" className="hover:underline underline-offset-4">
-            Index
-          </Link>
-          <span className="mx-3">/</span>
-          {play.serial}
-        </p>
+    <main
+      style={{
+        minHeight: '100vh',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: '24px 12px',
+      }}
+    >
+      <div style={{ width: 360, maxWidth: '100%', position: 'relative' }}>
+        <div className="page" style={{ padding: '18px 20px 14px', minHeight: 740 }}>
+          <PageRunner page={play.pageNumber} />
+          <div className="chrome-line thin" style={{ marginTop: 6 }} />
 
-        <header className="mt-8 border-b border-navy/20 pb-8">
-          <h1 className="font-display text-5xl md:text-6xl leading-[1.05]">
+          <div style={{ paddingTop: 10 }}>
+            {/* Capitalize first letter of genre for the stripe label */}
+            <GenreStripe genre={play.genre} />
+          </div>
+
+          <div
+            className="mono-tiny"
+            style={{ display: 'flex', justifyContent: 'space-between', marginTop: 10 }}
+          >
+            <span>SERIAL · {play.serial}</span>
+            <span>FOLIO ENTRY · {String(play.pageNumber).padStart(2, '0')}/39</span>
+          </div>
+
+          <h1
+            className="play-title"
+            style={{
+              fontSize: play.title.length > 18 ? 38 : 46,
+              margin: '12px 0 0',
+            }}
+          >
             {play.title}
           </h1>
-          <p className="mt-4 font-mono text-xs uppercase tracking-[0.2em] text-red">
-            {play.genre}
-            {!play.inFirstFolio && ' · not in first folio'}
-          </p>
-        </header>
+          <div className="play-sub" style={{ fontSize: 16, marginTop: 2 }}>
+            {play.subtitle}
+          </div>
 
-        <dl className="mt-8 grid grid-cols-2 md:grid-cols-3 gap-x-6 gap-y-4 font-mono text-sm">
-          <Field label="Year written" value={String(play.yearWritten)} />
-          <Field label="Acts" value={String(play.acts)} />
-          <Field label="Characters" value={`~${play.characterCount}`} />
-          <Field label="Runtime" value={`~${runtimeText}`} />
-          <Field
-            label="First folio"
-            value={play.inFirstFolio ? 'Yes' : 'No'}
-          />
-          <Field label="Serial" value={play.serial} />
-        </dl>
+          <div
+            style={{
+              position: 'relative',
+              height: 240,
+              margin: '4px -8px 6px',
+              padding: 0,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              overflow: 'visible',
+            }}
+          >
+            <PlayPlate play={play} />
+          </div>
 
-        <section className="mt-10">
-          <h2 className="font-mono text-xs uppercase tracking-[0.2em] text-navy/70">
-            Source
-          </h2>
-          <p className="mt-2">{play.source}</p>
-        </section>
+          <div className="dotted" style={{ margin: '2px 0 10px' }} />
 
-        <section className="mt-10">
-          <h2 className="font-mono text-xs uppercase tracking-[0.2em] text-navy/70">
-            Notable lines
-          </h2>
-          <ul className="mt-2 space-y-3 max-w-prose">
-            {play.notableLines.map((line, i) => (
-              <li key={i} className="font-display text-xl leading-snug">
-                “{line}”
-              </li>
-            ))}
-          </ul>
-        </section>
+          <SpecBlock play={play} />
 
-        <section className="mt-12 border-t border-navy/20 pt-8">
-          <h2 className="font-mono text-xs uppercase tracking-[0.2em] text-navy/70">
-            Stamps
-          </h2>
-          <p className="mt-3 font-mono text-sm text-navy/60">
-            No stamps yet — manual stamping ships in step 2.
-          </p>
-        </section>
+          <div className="dotted" style={{ margin: '10px 0' }} />
 
-        <section className="mt-12 border-t border-navy/20 pt-8">
-          <h2 className="font-mono text-xs uppercase tracking-[0.2em] text-navy/70">
-            Where to see this
-          </h2>
-          <p className="mt-3 font-mono text-sm text-navy/60">
-            Discovery layer ships in step 4.
-          </p>
-        </section>
+          <AnnotQuotes quotes={play.notableLines} />
+
+          {/* footer status */}
+          <div style={{ position: 'absolute', left: 20, right: 20, bottom: 14 }}>
+            <div className="dotted" style={{ marginBottom: 6 }} />
+            <div className="mono-tiny" style={{ display: 'flex', justifyContent: 'space-between' }}>
+              <span>STATUS · AWAITING INSPECTION</span>
+              <span style={{ color: 'var(--vermilion)' }}>NOT YET INSPECTED</span>
+            </div>
+          </div>
+
+          {/* unstamped overlay */}
+          {mode === 'unstamped' && (
+            <div
+              style={{
+                position: 'absolute',
+                top: '52%',
+                right: '8%',
+                transform: 'rotate(-7deg)',
+                pointerEvents: 'none',
+              }}
+            >
+              <StampAwaiting />
+            </div>
+          )}
+        </div>
+
+        {/* page-flip nav (v1: simple links; swipe + animation comes later) */}
+        <nav
+          aria-label="Page navigation"
+          className="mono-tiny"
+          style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            padding: '14px 8px 0',
+            color: 'var(--ink-faint)',
+          }}
+        >
+          {prev ? (
+            <Link href={`/play/${prev.id}`} style={{ color: 'inherit', textDecoration: 'none' }}>
+              ← {prev.title}
+            </Link>
+          ) : (
+            <Link href="/" style={{ color: 'inherit', textDecoration: 'none' }}>
+              ← COVER
+            </Link>
+          )}
+          <span aria-hidden style={{ opacity: 0.5 }}>
+            PAGE {String(play.pageNumber).padStart(2, '0')} / 39
+          </span>
+          {next ? (
+            <Link href={`/play/${next.id}`} style={{ color: 'inherit', textDecoration: 'none' }}>
+              {next.title} →
+            </Link>
+          ) : (
+            <span style={{ opacity: 0.4 }}>END</span>
+          )}
+        </nav>
       </div>
     </main>
-  )
-}
-
-function Field({ label, value }: { label: string; value: string }) {
-  return (
-    <div>
-      <dt className="text-xs uppercase tracking-[0.15em] text-navy/60">
-        {label}
-      </dt>
-      <dd className="mt-1">{value}</dd>
-    </div>
   )
 }
