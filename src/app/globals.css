@@ -52,6 +52,39 @@ body {
   margin: 0;
 }
 
+/* App layout — mobile-first.
+ * The page fills the viewport minus the bottom chrome on mobile.
+ * On desktop (>= 600px) it falls back to a centered 360x740 framed card.
+ */
+:root {
+  --chrome-height: 60px;
+}
+
+.page-stage {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  padding-bottom: calc(var(--chrome-height) + env(safe-area-inset-bottom, 0px));
+  box-sizing: border-box;
+}
+.page-stage > .swipe-nav {
+  flex: 1;
+  display: flex;
+}
+
+@media (min-width: 600px) {
+  .page-stage {
+    align-items: center;
+    justify-content: center;
+    padding: 24px 12px calc(var(--chrome-height) + 24px);
+  }
+  .page-stage > .swipe-nav {
+    flex: none;
+    width: 360px;
+    height: 740px;
+  }
+}
+
 /* fonts */
 .f-display {
   font-family: var(--font-display), 'Iowan Old Style', Georgia, serif;

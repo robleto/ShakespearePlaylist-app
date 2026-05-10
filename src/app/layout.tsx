@@ -1,7 +1,9 @@
 import './globals.css'
-import type { Metadata } from 'next'
+import type { Metadata, Viewport } from 'next'
 import { EB_Garamond, IBM_Plex_Sans, IBM_Plex_Mono } from 'next/font/google'
 import { StampDefs } from '@/components/passport/StampDefs'
+import { SwipeNav } from '@/components/passport/SwipeNav'
+import { AppChrome } from '@/components/passport/AppChrome'
 
 const garamond = EB_Garamond({
   subsets: ['latin'],
@@ -31,6 +33,12 @@ export const metadata: Metadata = {
     'A passport for live Shakespeare. Thirty-nine plays, stamped on the page when the show is seen.',
 }
 
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  viewportFit: 'cover',
+}
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html
@@ -40,7 +48,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     >
       <body>
         <StampDefs />
-        {children}
+        <main className="page-stage">
+          <SwipeNav>{children}</SwipeNav>
+        </main>
+        <AppChrome />
       </body>
     </html>
   )
