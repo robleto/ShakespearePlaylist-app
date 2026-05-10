@@ -1,9 +1,10 @@
 'use client'
 
-import { useEffect } from 'react'
+import { useEffect, useMemo } from 'react'
 import Link from 'next/link'
 import { PLAYS } from '@/lib/plays'
 import type { PlayGenre } from '@/types/play'
+import { usePlaybook } from '@/hooks/usePlaybook'
 
 const GENRE_ORDER: { key: PlayGenre; label: string }[] = [
   { key: 'tragedy', label: 'TRAGEDIES' },
@@ -22,6 +23,8 @@ export function IndexSheet({
   onClose: () => void
   currentPlayId?: string
 }) {
+  const { stamps } = usePlaybook()
+
   // Lock body scroll while open + close on Escape
   useEffect(() => {
     if (!open) return
@@ -35,6 +38,13 @@ export function IndexSheet({
       window.removeEventListener('keydown', onKey)
     }
   }, [open, onClose])
+
+  const stampCounts = useMemo(() => {
+    const counts: Record<string, number> = {}
+    for (const s of stamps) counts[s.playId] = (counts[s.playId] ?? 0) + 1
+    return counts
+  }, [stamps])
+  const attestedTotal = Object.keys(stampCounts).length
 
   if (!open) return null
 
@@ -95,7 +105,8 @@ export function IndexSheet({
         >
           <div>
             <div className="mono-tiny" style={{ fontSize: 8 }}>
-              SHAKESPEARE PLAYBOOK
+              SHAKESPEARE PLAYBOOK · {String(attestedTotal).padStart(2, '0')}/{PLAYS.length}{' '}
+              ATTESTED
             </div>
             <div className="play-title" style={{ fontSize: 22, marginTop: 2, lineHeight: 1 }}>
               The Index
@@ -136,6 +147,8 @@ export function IndexSheet({
             <ul style={{ listStyle: 'none', margin: 0, padding: 0 }}>
               {group.plays.map((play) => {
                 const active = play.id === currentPlayId
+                const count = stampCounts[play.id] ?? 0
+                const attested = count > 0
                 return (
                   <li key={play.id}>
                     <Link
@@ -143,7 +156,7 @@ export function IndexSheet({
                       onClick={onClose}
                       style={{
                         display: 'grid',
-                        gridTemplateColumns: '1fr auto',
+                        gridTemplateColumns: 'auto 1fr auto',
                         alignItems: 'baseline',
                         gap: 10,
                         padding: '7px 0',
@@ -153,6 +166,19 @@ export function IndexSheet({
                         opacity: active ? 1 : 0.92,
                       }}
                     >
+                      <span
+                        aria-hidden
+                        style={{
+                          width: 12,
+                          textAlign: 'center',
+                          fontFamily: 'var(--font-mono), monospace',
+                          fontSize: 11,
+                          color: attested ? 'var(--vermilion)' : 'var(--ink-faint)',
+                          lineHeight: 1,
+                        }}
+                      >
+                        {attested ? '◉' : '○'}
+                      </span>
                       <span
                         className="play-title"
                         style={{
@@ -187,7 +213,9 @@ export function IndexSheet({
                       >
                         {play.serial}
                         <br />
-                        PAGE {String(play.pageNumber).padStart(2, '0')} / 39
+                        {attested
+                          ? `${String(count).padStart(2, '0')} VIEWING${count > 1 ? 'S' : ''}`
+                          : `PAGE ${String(play.pageNumber).padStart(2, '0')} / 39`}
                       </span>
                     </Link>
                   </li>

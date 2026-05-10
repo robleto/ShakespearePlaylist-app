@@ -1,13 +1,13 @@
 import Link from 'next/link'
 import { PLAYS } from '@/lib/plays'
 import { PlaybookSeal } from '@/components/passport/PlaybookSeal'
+import { ProgressBadge } from '@/components/passport/ProgressBadge'
 
 const HOLDER = {
   name: 'Greg Robleto',
   id: 'PB·0042·MD',
   issued: '08·MAY·2026',
   hometheatre: 'FOLGER · WASHINGTON DC',
-  seen: 0,
   total: PLAYS.length,
 }
 
@@ -188,9 +188,7 @@ export default function CoverPage() {
           gap: 6,
         }}
       >
-        <span className="mono-tiny" style={{ fontSize: 7 }}>
-          PROGRESS · {String(HOLDER.seen).padStart(2, '0')}/{HOLDER.total}
-        </span>
+        <ProgressBadge total={HOLDER.total} />
         <Link
           href={`/play/${firstPlay.id}`}
           className="mono-tiny"
