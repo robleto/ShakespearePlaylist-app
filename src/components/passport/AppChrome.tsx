@@ -4,6 +4,7 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { IndexSheet } from './IndexSheet'
+import { ChatSheet } from './ChatSheet'
 
 function currentPlayIdFromPath(pathname: string | null): string | undefined {
   if (pathname?.startsWith('/play/')) return pathname.slice('/play/'.length)
@@ -11,7 +12,8 @@ function currentPlayIdFromPath(pathname: string | null): string | undefined {
 }
 
 export function AppChrome() {
-  const [sheetOpen, setSheetOpen] = useState(false)
+  const [indexOpen, setIndexOpen] = useState(false)
+  const [chatOpen, setChatOpen] = useState(false)
   const pathname = usePathname()
   const onCover = pathname === '/'
   const currentPlayId = currentPlayIdFromPath(pathname)
@@ -29,8 +31,8 @@ export function AppChrome() {
           background: 'var(--paper)',
           borderTop: '1px solid var(--ink)',
           display: 'grid',
-          gridTemplateColumns: '1fr 1fr',
-          gap: 10,
+          gridTemplateColumns: '1fr 1fr 1fr',
+          gap: 8,
           zIndex: 40,
         }}
       >
@@ -40,7 +42,7 @@ export function AppChrome() {
           className="mono-cap"
           style={{
             textAlign: 'center',
-            padding: '9px 8px',
+            padding: '9px 6px',
             border: `1px solid ${onCover ? 'var(--ink)' : 'var(--ink-faint)'}`,
             color: 'var(--ink)',
             textDecoration: 'none',
@@ -48,15 +50,32 @@ export function AppChrome() {
             fontSize: 10,
           }}
         >
-          ⌂ &nbsp; HOME
+          ⌂ HOME
         </Link>
         <button
           type="button"
-          onClick={() => setSheetOpen(true)}
+          onClick={() => setChatOpen(true)}
           className="mono-cap"
           style={{
             textAlign: 'center',
-            padding: '9px 8px',
+            padding: '9px 6px',
+            border: '1px solid var(--ink)',
+            color: 'var(--paper)',
+            background: 'var(--ink)',
+            cursor: 'pointer',
+            fontSize: 10,
+            fontWeight: 600,
+          }}
+        >
+          ✎ INTAKE
+        </button>
+        <button
+          type="button"
+          onClick={() => setIndexOpen(true)}
+          className="mono-cap"
+          style={{
+            textAlign: 'center',
+            padding: '9px 6px',
             border: '1px solid var(--ink-faint)',
             color: 'var(--ink)',
             background: 'transparent',
@@ -64,14 +83,15 @@ export function AppChrome() {
             fontSize: 10,
           }}
         >
-          ☰ &nbsp; INDEX
+          ☰ INDEX
         </button>
       </nav>
       <IndexSheet
-        open={sheetOpen}
-        onClose={() => setSheetOpen(false)}
+        open={indexOpen}
+        onClose={() => setIndexOpen(false)}
         currentPlayId={currentPlayId}
       />
+      <ChatSheet open={chatOpen} onClose={() => setChatOpen(false)} />
     </>
   )
 }
