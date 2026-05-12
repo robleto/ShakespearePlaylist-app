@@ -1,22 +1,16 @@
+import { HOLDER } from '@/lib/holder'
+
 type PageRunnerProps = {
-  playbook?: string
   page: number
   total?: number
-  holder?: string
 }
 
-export function PageRunner({
-  playbook = 'SHAKESPEARE PLAYBOOK · FIRST FOLIO ED.',
-  page,
-  total = 39,
-  holder = 'PB·0042·MD',
-}: PageRunnerProps) {
+export function PageRunner({ page, total = 39 }: PageRunnerProps) {
   return (
     <div className="runner">
-      <span className="spaced">{playbook}</span>
-      <span className="spaced">{holder}</span>
+      <span className="spaced">{HOLDER.name}</span>
       <span className="spaced">
-        PAGE {String(page).padStart(2, '0')} / {total}
+        {String(page).padStart(2, '0')} / {total}
       </span>
     </div>
   )

@@ -32,6 +32,7 @@ export const PLAYS: Play[] = [
       'The play’s the thing wherein I’ll catch the conscience of the king.',
       'There are more things in heaven and earth, Horatio, than are dreamt of in your philosophy.',
     ],
+    notableLineRefs: ['3.1', '2.2', '1.5'],
     plate: '/plates/hamlet.svg',
     altTitles: ['Hamlet, Prince of Denmark'],
   },

@@ -20,6 +20,11 @@ let snapshot: PlaybookState = emptyState()
 let hydrated = false
 const listeners = new Set<() => void>()
 
+// Cached SSR snapshot. Must be a stable reference: useSyncExternalStore
+// compares by identity, and a fresh emptyState() each call triggers an
+// infinite-render warning.
+const SERVER_SNAPSHOT: PlaybookState = emptyState()
+
 function emit() {
   listeners.forEach((l) => l())
 }
@@ -59,8 +64,7 @@ function getSnapshot(): PlaybookState {
 }
 
 function getServerSnapshot(): PlaybookState {
-  // Server rendering has no localStorage; render the unstamped state.
-  return emptyState()
+  return SERVER_SNAPSHOT
 }
 
 // Sync across tabs / windows

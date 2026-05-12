@@ -85,6 +85,68 @@ body {
   }
 }
 
+/* edge-click navigation — desktop only.
+ * Two transparent buttons fill the empty viewport space on either side
+ * of the centered 360px page card. Hidden on mobile (swipe handles that).
+ */
+.edge-zone {
+  display: none;
+}
+@media (min-width: 600px) {
+  .edge-zone {
+    position: fixed;
+    top: 0;
+    bottom: var(--chrome-height);
+    width: calc((100vw - 360px) / 2);
+    display: flex;
+    align-items: center;
+    background: transparent;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    color: var(--ink-faint);
+    z-index: 5;
+    transition: color 180ms ease-out;
+  }
+  .edge-zone.left {
+    left: 0;
+    justify-content: flex-end;
+    padding-right: 28px;
+  }
+  .edge-zone.right {
+    right: 0;
+    justify-content: flex-start;
+    padding-left: 28px;
+  }
+  .edge-zone:hover,
+  .edge-zone:focus-visible {
+    color: var(--vermilion);
+    outline: none;
+  }
+  .edge-zone .hint {
+    font-family: var(--font-display), serif;
+    font-size: 36px;
+    line-height: 1;
+    opacity: 0;
+    transform: translateX(0);
+    transition:
+      opacity 180ms ease-out,
+      transform 180ms ease-out;
+  }
+  .edge-zone:hover .hint,
+  .edge-zone:focus-visible .hint {
+    opacity: 1;
+  }
+  .edge-zone.left:hover .hint,
+  .edge-zone.left:focus-visible .hint {
+    transform: translateX(-3px);
+  }
+  .edge-zone.right:hover .hint,
+  .edge-zone.right:focus-visible .hint {
+    transform: translateX(3px);
+  }
+}
+
 /* fonts */
 .f-display {
   font-family: var(--font-display), 'Iowan Old Style', Georgia, serif;

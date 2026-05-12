@@ -1,11 +1,20 @@
-import type { Play } from '@/types/play'
+import type { Play, PlayGenre } from '@/types/play'
 import { formatRuntime } from '@/lib/plays'
+
+const GENRE_LABEL: Record<PlayGenre, string> = {
+  tragedy: 'Tragedy',
+  comedy: 'Comedy',
+  history: 'History',
+  romance: 'Romance',
+  apocrypha: 'Apocrypha',
+}
 
 export function SpecBlock({ play }: { play: Play }) {
   return (
     <div className="spec">
+      <Row k="Class.">{GENRE_LABEL[play.genre]}</Row>
       <Row k="Year writ.">{play.yearWritten}</Row>
-      <Row k="Acts">{play.acts} · sc. variable</Row>
+      <Row k="Acts">{play.acts}</Row>
       <Row k="Cast">{play.characterCount} speaking parts</Row>
       <Row k="Runtime">≈ {formatRuntime(play.approximateRuntime)} (uncut)</Row>
       <Row k="Folio">{play.folioLabel}</Row>

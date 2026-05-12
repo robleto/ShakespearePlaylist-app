@@ -1,15 +1,8 @@
 import Link from 'next/link'
 import { PLAYS } from '@/lib/plays'
+import { HOLDER } from '@/lib/holder'
 import { PlaybookSeal } from '@/components/passport/PlaybookSeal'
 import { ProgressBadge } from '@/components/passport/ProgressBadge'
-
-const HOLDER = {
-  name: 'Greg Robleto',
-  id: 'PB·0042·MD',
-  issued: '08·MAY·2026',
-  hometheatre: 'FOLGER · WASHINGTON DC',
-  total: PLAYS.length,
-}
 
 export default function CoverPage() {
   const firstPlay = PLAYS[0]
@@ -25,26 +18,6 @@ export default function CoverPage() {
     >
       {/* top frame */}
       <div className="chrome-line" style={{ borderTopWidth: 2 }} />
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          padding: '7px 0',
-          alignItems: 'baseline',
-          gap: 6,
-        }}
-      >
-        <span className="mono-tiny" style={{ fontSize: 7 }}>
-          SP · ENT.GOV
-        </span>
-        <span className="mono-tiny" style={{ fontSize: 7 }}>
-          FIRST FOLIO ED.
-        </span>
-        <span className="mono-tiny" style={{ fontSize: 7 }}>
-          XXXIX · 1 HOLDER
-        </span>
-      </div>
-      <div className="chrome-line thin" />
 
       <div
         style={{
@@ -79,28 +52,13 @@ export default function CoverPage() {
           An Inventory of Productions Attended Live
         </div>
 
-        <div style={{ margin: '20px 0 14px' }}>
+        <div style={{ margin: '20px 0 18px' }}>
           <PlaybookSeal size={120} />
-        </div>
-
-        <div
-          className="mono-cap"
-          style={{
-            fontSize: 8.5,
-            letterSpacing: '.28em',
-            borderTop: '1px solid var(--ink)',
-            borderBottom: '1px solid var(--ink)',
-            padding: '5px 10px',
-            whiteSpace: 'nowrap',
-          }}
-        >
-          FIRST FOLIO EDITION · XXXIX PLAYS
         </div>
 
         <div
           className="mono-tiny"
           style={{
-            marginTop: 8,
             color: 'var(--ink-soft)',
             fontSize: 7,
             letterSpacing: '.2em',
@@ -118,17 +76,18 @@ export default function CoverPage() {
       {/* holder block */}
       <div
         style={{
-          display: 'grid',
-          gridTemplateColumns: '1.1fr 1fr',
-          gap: '8px 10px',
-          padding: '9px 0',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'baseline',
+          gap: 10,
+          padding: '10px 0',
           borderTop: '1px solid var(--ink)',
           borderBottom: '1px solid var(--ink)',
         }}
       >
         <div style={{ minWidth: 0 }}>
           <div className="mono-tiny" style={{ fontSize: 7 }}>
-            ISSUED BY · HOLDER (SELF)
+            HOLDER
           </div>
           <div
             className="play-title"
@@ -145,35 +104,10 @@ export default function CoverPage() {
         </div>
         <div style={{ textAlign: 'right', minWidth: 0 }}>
           <div className="mono-tiny" style={{ fontSize: 7 }}>
-            HOLDER ID
-          </div>
-          <div className="f-mono" style={{ fontSize: 13, marginTop: 2 }}>
-            {HOLDER.id}
-          </div>
-        </div>
-        <div style={{ minWidth: 0 }}>
-          <div className="mono-tiny" style={{ fontSize: 7 }}>
             ISSUED
           </div>
           <div className="f-mono" style={{ fontSize: 11, marginTop: 2 }}>
             {HOLDER.issued}
-          </div>
-        </div>
-        <div style={{ textAlign: 'right', minWidth: 0 }}>
-          <div className="mono-tiny" style={{ fontSize: 7 }}>
-            HOME HOUSE
-          </div>
-          <div
-            className="f-mono"
-            style={{
-              fontSize: 9.5,
-              marginTop: 2,
-              whiteSpace: 'nowrap',
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-            }}
-          >
-            {HOLDER.hometheatre}
           </div>
         </div>
       </div>
@@ -188,13 +122,18 @@ export default function CoverPage() {
           gap: 6,
         }}
       >
-        <ProgressBadge total={HOLDER.total} />
+        <ProgressBadge total={PLAYS.length} />
         <Link
           href={`/play/${firstPlay.id}`}
-          className="mono-tiny"
-          style={{ color: 'var(--vermilion)', fontSize: 7, textDecoration: 'none' }}
+          className="mono-cap"
+          style={{
+            color: 'var(--vermilion)',
+            fontSize: 9,
+            letterSpacing: '.22em',
+            textDecoration: 'none',
+          }}
         >
-          ★ HOLDER PROPERTY ★ →
+          OPEN BOOK →
         </Link>
       </div>
     </div>

@@ -79,6 +79,13 @@ export function SwipeNav({ children }: { children: React.ReactNode }) {
       ? `transform ${RESTORE_MS}ms ease-out`
       : 'none'
 
+  function goPrev() {
+    router.push(locationHref(prevLocation(current)))
+  }
+  function goNext() {
+    router.push(locationHref(nextLocation(current)))
+  }
+
   return (
     <div
       className="swipe-nav"
@@ -88,6 +95,12 @@ export function SwipeNav({ children }: { children: React.ReactNode }) {
       onTouchCancel={handleTouchEnd}
       style={{ touchAction: 'pan-y', position: 'relative' }}
     >
+      <button type="button" aria-label="Previous page" className="edge-zone left" onClick={goPrev}>
+        <span className="hint">‹</span>
+      </button>
+      <button type="button" aria-label="Next page" className="edge-zone right" onClick={goNext}>
+        <span className="hint">›</span>
+      </button>
       <div
         style={{
           flex: 1,

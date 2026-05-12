@@ -6,7 +6,6 @@ import type { Play } from '@/types/play'
 import { usePlaybook } from '@/hooks/usePlaybook'
 import { deriveMode, toRenderData } from '@/lib/stamps'
 import { PageRunner } from './PageRunner'
-import { GenreStripe } from './GenreStripe'
 import { PlayPlate } from './PlayPlate'
 import { SpecBlock } from './SpecBlock'
 import { AnnotQuotes } from './AnnotQuotes'
@@ -42,23 +41,11 @@ export function PlayPageView({ play }: { play: Play }) {
         <PageRunner page={play.pageNumber} />
         <div className="chrome-line thin" style={{ marginTop: 6 }} />
 
-        <div style={{ paddingTop: 10 }}>
-          <GenreStripe genre={play.genre} />
-        </div>
-
-        <div
-          className="mono-tiny"
-          style={{ display: 'flex', justifyContent: 'space-between', marginTop: 10 }}
-        >
-          <span>SERIAL · {play.serial}</span>
-          <span>FOLIO ENTRY · {String(play.pageNumber).padStart(2, '0')}/39</span>
-        </div>
-
         <h1
           className="play-title"
           style={{
             fontSize: play.title.length > 18 ? 38 : 46,
-            margin: '12px 0 0',
+            margin: '14px 0 0',
           }}
         >
           {play.title}
@@ -89,7 +76,7 @@ export function PlayPageView({ play }: { play: Play }) {
 
         <div className="dotted" style={{ margin: '10px 0' }} />
 
-        <AnnotQuotes quotes={play.notableLines} />
+        <AnnotQuotes quotes={play.notableLines} refs={play.notableLineRefs} />
 
         {/* footer status + record affordance */}
         <div style={{ position: 'absolute', left: 20, right: 20, bottom: 14 }}>
