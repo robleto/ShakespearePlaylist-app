@@ -1,0 +1,47 @@
+{
+  "productions": [
+    {
+      "playId": "hamlet",
+      "productionCompany": "Folger Theatre",
+      "venue": "Folger Shakespeare Library",
+      "city": "Washington, DC",
+      "startDate": "2026-06-04",
+      "endDate": "2026-07-12",
+      "url": "https://www.folger.edu/",
+      "lastVerified": "2026-05-12",
+      "note": "Seed entry — replace via discovery:publish pipeline"
+    },
+    {
+      "playId": "hamlet",
+      "productionCompany": "The Public Theater",
+      "venue": "Delacorte Theater, Central Park",
+      "city": "New York, NY",
+      "startDate": "2026-07-15",
+      "endDate": "2026-08-23",
+      "url": "https://publictheater.org/",
+      "lastVerified": "2026-05-12",
+      "note": "Free Shakespeare in the Park"
+    },
+    {
+      "playId": "midsummer-nights-dream",
+      "productionCompany": "Oregon Shakespeare Festival",
+      "venue": "Allen Elizabethan Theatre",
+      "city": "Ashland, OR",
+      "startDate": "2026-06-12",
+      "endDate": "2026-10-11",
+      "url": "https://www.osfashland.org/",
+      "lastVerified": "2026-05-12"
+    },
+    {
+      "playId": "macbeth",
+      "productionCompany": "Royal Shakespeare Company",
+      "venue": "Royal Shakespeare Theatre",
+      "city": "Stratford-upon-Avon",
+      "startDate": "2026-09-18",
+      "endDate": "2027-01-23",
+      "url": "https://www.rsc.org.uk/",
+      "lastVerified": "2026-05-12"
+    }
+  ],
+  "lastPublished": null
+}

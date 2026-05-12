@@ -3,18 +3,20 @@
 import { useState } from 'react'
 import type { Stamp } from '@/types/stamp'
 import type { Play } from '@/types/play'
+import type { Production } from '@/types/production'
 import { usePlaybook } from '@/hooks/usePlaybook'
 import { deriveMode, toRenderData } from '@/lib/stamps'
 import { PageRunner } from './PageRunner'
 import { PlayPlate } from './PlayPlate'
 import { SpecBlock } from './SpecBlock'
 import { AnnotQuotes } from './AnnotQuotes'
+import { DiscoveryAddendum } from './DiscoveryAddendum'
 import { StampOverlay } from './StampOverlay'
 import { StampSheet } from './StampSheet'
 
 type SheetMode = { kind: 'new'; playId: string } | { kind: 'edit'; stamp: Stamp } | null
 
-export function PlayPageView({ play }: { play: Play }) {
+export function PlayPageView({ play, productions }: { play: Play; productions: Production[] }) {
   const { stampsForPlay } = usePlaybook()
   const stamps = stampsForPlay(play.id)
   const mode = deriveMode(stamps)
@@ -76,7 +78,11 @@ export function PlayPageView({ play }: { play: Play }) {
 
         <div className="dotted" style={{ margin: '10px 0' }} />
 
-        <AnnotQuotes quotes={play.notableLines} refs={play.notableLineRefs} />
+        {mode === 'unstamped' ? (
+          <DiscoveryAddendum productions={productions} />
+        ) : (
+          <AnnotQuotes quotes={play.notableLines} refs={play.notableLineRefs} />
+        )}
 
         {/* footer status + record affordance */}
         <div style={{ position: 'absolute', left: 20, right: 20, bottom: 14 }}>

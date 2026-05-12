@@ -1,5 +1,6 @@
 import { notFound } from 'next/navigation'
 import { PLAYS, getPlay } from '@/lib/plays'
+import { productionsForPlay } from '@/lib/productions'
 import { PlayPageView } from '@/components/passport/PlayPageView'
 
 export function generateStaticParams() {
@@ -9,5 +10,6 @@ export function generateStaticParams() {
 export default function PlayPage({ params }: { params: { id: string } }) {
   const play = getPlay(params.id)
   if (!play) notFound()
-  return <PlayPageView play={play} />
+  const productions = productionsForPlay(play.id)
+  return <PlayPageView play={play} productions={productions} />
 }
