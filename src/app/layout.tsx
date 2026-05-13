@@ -48,6 +48,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     >
       <body>
         <StampDefs />
+        <aside className="handheld-notice" role="note">
+          <span className="hn-title">Notice of Form · For handheld carriage</span>
+          <span className="hn-body">
+            Rendered at issue size. Open this URL on a phone to attend.
+          </span>
+        </aside>
         <main className="page-stage">
           <SwipeNav>{children}</SwipeNav>
         </main>

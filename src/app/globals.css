@@ -77,11 +77,46 @@ body {
     align-items: center;
     justify-content: center;
     padding: 24px 12px calc(var(--chrome-height) + 24px);
+    /* Subtract the handheld notice height so the centered card doesn't
+     * push the viewport into a scroll. */
+    min-height: calc(100dvh - 56px);
   }
   .page-stage > .swipe-nav {
     flex: none;
     width: 360px;
     height: 740px;
+  }
+}
+
+/* Handheld notice — the product is mobile-only by design. On desktop,
+ * the centered framed card still renders for preview, but a small
+ * banner above the page-stage tells the visitor this is meant for a
+ * phone. Hidden on mobile entirely.
+ */
+.handheld-notice {
+  display: none;
+}
+@media (min-width: 600px) {
+  .handheld-notice {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: 14px 20px 12px;
+    background: var(--paper-deep);
+    border-bottom: 1px solid var(--ink-hair);
+    color: var(--ink-soft);
+    font-family: var(--font-mono), monospace;
+  }
+  .handheld-notice .hn-title {
+    font-size: 9px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--ink);
+  }
+  .handheld-notice .hn-body {
+    font-size: 10.5px;
+    letter-spacing: 0.04em;
   }
 }
 

@@ -6,6 +6,16 @@ A digital passport for tracking live Shakespeare productions. Thirty-nine plays,
 
 **v1, in progress.** Single-user, single-device, localStorage-backed. No accounts, no sync, no analytics.
 
+## Form factor
+
+**Mobile-only by design.** A passport is held in the hand, not displayed on a 27" monitor. The 360×740 frame is canonical; mobile is the product. Desktop renders the same canvas with a short banner above it ("For handheld carriage · rendered at issue size") — graceful degrade, not parity. The desktop view is for previewing during development and casual reads; it isn't an alternate UX target.
+
+## Intentions, down the road
+
+- **v2** — accounts, multi-device sync. The dormant `prisma/schema.prisma` becomes the live data model. The localStorage-only assumption ends.
+- **Step 4c** — resurrect the scraper pipeline from git history (`ShakesFind` adapters, normalization, review queue) and feed it into `data/productions.source.json` via the existing `discovery:publish` boundary.
+- **Apple App Store** — long-term distribution target. This Next.js codebase is the proving ground for visual system, voice, and interaction model. An App Store version (likely React Native or native Swift) will inherit the design and ship as a phone-first app.
+
 ## Stack
 
 - Next.js 14 (App Router) · React 18 · TypeScript
