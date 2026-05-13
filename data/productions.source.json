@@ -1,4 +1,8 @@
 {
+  "_meta": {
+    "purpose": "Curated source for the discovery layer. Edit here, then run `pnpm discovery:publish` to emit public/productions.json. This file is the editorial truth — the published file is its sorted, validated, timestamped copy.",
+    "entryShape": "Each entry must match the Production type in src/types/production.ts. playId must match an id in src/lib/plays.ts."
+  },
   "productions": [
     {
       "playId": "hamlet",
@@ -23,16 +27,6 @@
       "note": "Free Shakespeare in the Park"
     },
     {
-      "playId": "macbeth",
-      "productionCompany": "Royal Shakespeare Company",
-      "venue": "Royal Shakespeare Theatre",
-      "city": "Stratford-upon-Avon",
-      "startDate": "2026-09-18",
-      "endDate": "2027-01-23",
-      "url": "https://www.rsc.org.uk/",
-      "lastVerified": "2026-05-12"
-    },
-    {
       "playId": "midsummer-nights-dream",
       "productionCompany": "Oregon Shakespeare Festival",
       "venue": "Allen Elizabethan Theatre",
@@ -41,7 +35,16 @@
       "endDate": "2026-10-11",
       "url": "https://www.osfashland.org/",
       "lastVerified": "2026-05-12"
+    },
+    {
+      "playId": "macbeth",
+      "productionCompany": "Royal Shakespeare Company",
+      "venue": "Royal Shakespeare Theatre",
+      "city": "Stratford-upon-Avon",
+      "startDate": "2026-09-18",
+      "endDate": "2027-01-23",
+      "url": "https://www.rsc.org.uk/",
+      "lastVerified": "2026-05-12"
     }
-  ],
-  "lastPublished": "2026-05-13T00:41:13.576Z"
+  ]
 }
