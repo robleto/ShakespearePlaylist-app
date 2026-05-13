@@ -85,6 +85,35 @@ body {
   }
 }
 
+/* Stamp landing animation — fires once when a new stamp commits.
+ * The wrapper element scales down and fades in (a "stamp pressed onto
+ * the page" feel). The inner stamp's own rotate/scale stay intact —
+ * this animation runs on a wrapper, not on the stamp itself.
+ */
+@keyframes stamp-land {
+  0% {
+    transform: scale(1.6) translateY(-16px);
+    opacity: 0;
+  }
+  60% {
+    transform: scale(0.94) translateY(0);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1) translateY(0);
+    opacity: 1;
+  }
+}
+.stamp-landing {
+  animation: stamp-land 320ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  transform-origin: center center;
+}
+@media (prefers-reduced-motion: reduce) {
+  .stamp-landing {
+    animation: none;
+  }
+}
+
 /* edge-click navigation — desktop only.
  * Two transparent buttons fill the empty viewport space on either side
  * of the centered 360px page card. Hidden on mobile (swipe handles that).

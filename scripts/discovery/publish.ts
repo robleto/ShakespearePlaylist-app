@@ -93,7 +93,8 @@ function main(): void {
   }
 
   console.log(`✓ Validated ${productions.length} production(s) across ${byPlay.size} play(s)`)
-  for (const [playId, count] of [...byPlay.entries()].sort()) {
+  const tally = Array.from(byPlay.entries()).sort(([a], [b]) => a.localeCompare(b))
+  for (const [playId, count] of tally) {
     console.log(`  · ${playId}: ${count}`)
   }
 

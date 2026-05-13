@@ -71,6 +71,21 @@ export default function CoverPage() {
           COMEDIES, HISTORIES &amp; TRAGEDIES
           <br />· LONDON · ANNO MDCXXIII ·
         </div>
+
+        <div
+          className="play-sub"
+          style={{
+            fontSize: 11,
+            marginTop: 18,
+            padding: '0 18px',
+            lineHeight: 1.4,
+            color: 'var(--ink-soft)',
+          }}
+        >
+          A page is attested when its play has been seen in performance.
+          <br />
+          The completed book is the artifact.
+        </div>
       </div>
 
       {/* holder block */}

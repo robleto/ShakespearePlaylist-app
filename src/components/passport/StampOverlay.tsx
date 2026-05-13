@@ -21,10 +21,13 @@ export function StampOverlay({
   mode,
   stamps,
   onEdit,
+  landingId,
 }: {
   mode: StampMode
   stamps: StampRenderData[]
   onEdit: (stampId: string) => void
+  /** ID of a stamp that should run the entrance animation. */
+  landingId?: string | null
 }) {
   if (mode === 'unstamped') {
     return (
@@ -48,6 +51,7 @@ export function StampOverlay({
         <ClickableStamp
           onClick={() => stamps[0] && onEdit(stamps[0].id)}
           style={{ top: '30%', right: '10%' }}
+          landing={!!stamps[0] && stamps[0].id === landingId}
         >
           <StampSeenNoData rotate={-6} />
         </ClickableStamp>
@@ -59,7 +63,11 @@ export function StampOverlay({
     const s = stamps[0]
     return (
       <div className="stamp-cluster" style={{ inset: 0 }}>
-        <ClickableStamp onClick={() => onEdit(s.id)} style={{ top: '10%', right: '-2%' }}>
+        <ClickableStamp
+          onClick={() => onEdit(s.id)}
+          style={{ top: '10%', right: '-2%' }}
+          landing={s.id === landingId}
+        >
           <RenderedStamp s={s} rotate={-9} scale={0.92} />
         </ClickableStamp>
       </div>
@@ -76,6 +84,7 @@ export function StampOverlay({
             key={s.id}
             onClick={() => onEdit(s.id)}
             style={{ top: slot.top, right: slot.right, zIndex: slot.z }}
+            landing={s.id === landingId}
           >
             <RenderedStamp s={s} rotate={slot.rotate} scale={slot.scale} />
           </ClickableStamp>
@@ -89,16 +98,19 @@ function ClickableStamp({
   onClick,
   style,
   children,
+  landing,
 }: {
   onClick: () => void
   style?: React.CSSProperties
   children: React.ReactNode
+  landing?: boolean
 }) {
   return (
     <button
       type="button"
       aria-label="Edit stamp"
       onClick={onClick}
+      className={landing ? 'stamp-landing' : undefined}
       style={{
         position: 'absolute',
         background: 'transparent',

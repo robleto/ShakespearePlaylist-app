@@ -50,7 +50,7 @@ export function AppChrome() {
             fontSize: 10,
           }}
         >
-          ⌂ HOME
+          HOME
         </Link>
         <button
           type="button"
@@ -67,7 +67,7 @@ export function AppChrome() {
             fontWeight: 600,
           }}
         >
-          ✎ INTAKE
+          INTAKE
         </button>
         <button
           type="button"
@@ -83,7 +83,7 @@ export function AppChrome() {
             fontSize: 10,
           }}
         >
-          ☰ INDEX
+          INDEX
         </button>
       </nav>
       <IndexSheet

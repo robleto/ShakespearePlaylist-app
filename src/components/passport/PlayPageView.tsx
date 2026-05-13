@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import type { Stamp } from '@/types/stamp'
 import type { Play } from '@/types/play'
 import type { Production } from '@/types/production'
@@ -22,6 +22,29 @@ export function PlayPageView({ play, productions }: { play: Play; productions: P
   const mode = deriveMode(stamps)
   const renderStamps = toRenderData(stamps).slice(0, 3)
   const [sheetMode, setSheetMode] = useState<SheetMode>(null)
+
+  // Animate the entrance of a newly-committed stamp exactly once. We
+  // diff the stamp ID set against the previous render; any new ID gets
+  // marked as `landingId` for the duration of the keyframe animation,
+  // then cleared so subsequent renders show the stamp at rest.
+  const [landingId, setLandingId] = useState<string | null>(null)
+  const seenIds = useRef<Set<string>>(new Set())
+  useEffect(() => {
+    const ids = stamps.map((s) => s.id)
+    let freshId: string | null = null
+    for (const id of ids) {
+      if (!seenIds.current.has(id)) {
+        freshId = id
+        break
+      }
+    }
+    seenIds.current = new Set(ids)
+    if (freshId) {
+      setLandingId(freshId)
+      const t = setTimeout(() => setLandingId(null), 360)
+      return () => clearTimeout(t)
+    }
+  }, [stamps])
 
   function openEdit(stampId: string) {
     const target = stamps.find((s) => s.id === stampId)
@@ -69,7 +92,7 @@ export function PlayPageView({ play, productions }: { play: Play; productions: P
           }}
         >
           <PlayPlate play={play} />
-          <StampOverlay mode={mode} stamps={renderStamps} onEdit={openEdit} />
+          <StampOverlay mode={mode} stamps={renderStamps} onEdit={openEdit} landingId={landingId} />
         </div>
 
         <div className="dotted" style={{ margin: '2px 0 10px' }} />
@@ -78,7 +101,7 @@ export function PlayPageView({ play, productions }: { play: Play; productions: P
 
         <div className="dotted" style={{ margin: '10px 0' }} />
 
-        {mode === 'unstamped' ? (
+        {mode === 'unstamped' && productions.length > 0 ? (
           <DiscoveryAddendum productions={productions} />
         ) : (
           <AnnotQuotes quotes={play.notableLines} refs={play.notableLineRefs} />

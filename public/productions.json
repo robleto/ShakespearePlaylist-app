@@ -8,8 +8,7 @@
       "startDate": "2026-06-04",
       "endDate": "2026-07-12",
       "url": "https://www.folger.edu/",
-      "lastVerified": "2026-05-12",
-      "note": "Seed entry — replace via discovery:publish pipeline"
+      "lastVerified": "2026-05-12"
     },
     {
       "playId": "hamlet",
@@ -43,5 +42,5 @@
       "lastVerified": "2026-05-12"
     }
   ],
-  "lastPublished": "2026-05-13T00:41:13.576Z"
+  "lastPublished": "2026-05-13T01:36:26.543Z"
 }
