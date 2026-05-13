@@ -62,7 +62,15 @@ export function PlayPageView({ play, productions }: { play: Play; productions: P
 
   return (
     <>
-      <div className="page" style={{ padding: '18px 20px 14px', position: 'relative' }}>
+      <div
+        className="page"
+        style={{
+          padding: '18px 20px 14px',
+          position: 'relative',
+          display: 'flex',
+          flexDirection: 'column',
+        }}
+      >
         <PageRunner page={play.pageNumber} />
         <div className="chrome-line thin" style={{ marginTop: 6 }} />
 
@@ -101,14 +109,28 @@ export function PlayPageView({ play, productions }: { play: Play; productions: P
 
         <div className="dotted" style={{ margin: '10px 0' }} />
 
-        {mode === 'unstamped' && productions.length > 0 ? (
-          <DiscoveryAddendum productions={productions} />
-        ) : (
-          <AnnotQuotes quotes={play.notableLines} refs={play.notableLineRefs} />
-        )}
+        {/* Whichever block lands here takes whatever vertical space
+            remains and scrolls internally if it overflows. Keeps the
+            page-as-leaf bounded; user scrolls the section, not the leaf. */}
+        <div
+          style={{
+            flex: 1,
+            minHeight: 0,
+            overflowY: 'auto',
+            overscrollBehavior: 'contain',
+          }}
+        >
+          {mode === 'unstamped' && productions.length > 0 ? (
+            <DiscoveryAddendum productions={productions} />
+          ) : (
+            <AnnotQuotes quotes={play.notableLines} refs={play.notableLineRefs} />
+          )}
+        </div>
 
-        {/* footer status + record affordance */}
-        <div style={{ position: 'absolute', left: 20, right: 20, bottom: 14 }}>
+        {/* footer status + record affordance — fixed at the bottom of
+            the page card via flex flow, not absolute positioning, so
+            the scrollable section above never collides with it. */}
+        <div style={{ flexShrink: 0, marginTop: 6 }}>
           <div className="dotted" style={{ marginBottom: 6 }} />
           <div
             style={{
