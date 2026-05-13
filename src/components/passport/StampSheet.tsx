@@ -65,17 +65,9 @@ export function StampSheet({ mode, onClose }: { mode: Mode; onClose: () => void 
   function handleSave(e: React.FormEvent) {
     e.preventDefault()
     setError(null)
-    if (!productionCompany.trim() || !venue.trim() || !city.trim()) {
-      setError('Production company, venue, and city are required.')
-      return
-    }
     const dateTrim = date.trim()
-    if (!dateTrim) {
-      setError('Date is required — year at minimum (e.g. 2026).')
-      return
-    }
-    if (!/^\d{4}(-\d{2}(-\d{2})?)?$/.test(dateTrim)) {
-      setError('Date must be 2026, 2026-05, or 2026-05-12.')
+    if (dateTrim && !/^\d{4}(-\d{2}(-\d{2})?)?$/.test(dateTrim)) {
+      setError('Date must be 2026, 2026-05, or 2026-05-12 — or leave blank.')
       return
     }
     const draft: StampDraft = {
@@ -148,49 +140,59 @@ export function StampSheet({ mode, onClose }: { mode: Mode; onClose: () => void 
       >
         <header
           style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'baseline',
             paddingBottom: 10,
             borderBottom: '1px solid var(--ink)',
             marginBottom: 14,
           }}
         >
-          <div>
-            <div className="mono-tiny" style={{ fontSize: 8 }}>
-              {editing ? 'AMEND ENTRY' : 'RECORD VIEWING'}
-            </div>
-            <div className="play-title" style={{ fontSize: 22, marginTop: 2, lineHeight: 1 }}>
-              {editing ? 'Amend Entry' : 'New Viewing'}
-            </div>
-          </div>
-          <button
-            type="button"
-            onClick={onClose}
-            className="mono-cap"
-            aria-label="Close"
+          <div
             style={{
-              background: 'transparent',
-              border: '1px solid var(--ink-faint)',
-              padding: '4px 10px',
-              color: 'var(--ink)',
-              cursor: 'pointer',
-              fontSize: 9,
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'baseline',
             }}
           >
-            CLOSE
-          </button>
+            <div>
+              <div className="mono-tiny" style={{ fontSize: 8 }}>
+                {editing ? 'AMEND ENTRY' : 'RECORD VIEWING'}
+              </div>
+              <div className="play-title" style={{ fontSize: 22, marginTop: 2, lineHeight: 1 }}>
+                {editing ? 'Amend Entry' : 'New Viewing'}
+              </div>
+            </div>
+            <button
+              type="button"
+              onClick={onClose}
+              className="mono-cap"
+              aria-label="Close"
+              style={{
+                background: 'transparent',
+                border: '1px solid var(--ink-faint)',
+                padding: '4px 10px',
+                color: 'var(--ink)',
+                cursor: 'pointer',
+                fontSize: 9,
+              }}
+            >
+              CLOSE
+            </button>
+          </div>
+          <div
+            className="play-sub"
+            style={{ fontSize: 12, marginTop: 6, color: 'var(--ink-soft)' }}
+          >
+            Fill what you remember. Nothing is required — more detail makes a richer stamp.
+          </div>
         </header>
 
-        <Field label="Date — year required, full date if known">
+        <Field label="Date">
           <input
             type="text"
             value={date}
             onChange={(e) => setDate(e.target.value)}
             placeholder="2026 or 2026-05 or 2026-05-12"
             pattern="\d{4}(-\d{2}(-\d{2})?)?"
-            title="2026, 2026-05, or 2026-05-12"
-            required
+            title="2026, 2026-05, or 2026-05-12 — or leave blank"
             autoComplete="off"
             style={inputStyle}
           />
@@ -202,7 +204,6 @@ export function StampSheet({ mode, onClose }: { mode: Mode; onClose: () => void 
             value={productionCompany}
             onChange={(e) => setCompany(e.target.value)}
             placeholder="Royal Shakespeare Co."
-            required
             style={inputStyle}
           />
         </Field>
@@ -213,7 +214,6 @@ export function StampSheet({ mode, onClose }: { mode: Mode; onClose: () => void 
             value={venue}
             onChange={(e) => setVenue(e.target.value)}
             placeholder="Barbican"
-            required
             style={inputStyle}
           />
         </Field>
@@ -224,12 +224,11 @@ export function StampSheet({ mode, onClose }: { mode: Mode; onClose: () => void 
             value={city}
             onChange={(e) => setCity(e.target.value)}
             placeholder="London"
-            required
             style={inputStyle}
           />
         </Field>
 
-        <Field label="Director (optional)">
+        <Field label="Director">
           <input
             type="text"
             value={director}
@@ -239,7 +238,7 @@ export function StampSheet({ mode, onClose }: { mode: Mode; onClose: () => void 
           />
         </Field>
 
-        <Field label="Lead actor (optional)">
+        <Field label="Lead actor">
           <input
             type="text"
             value={leadActor}
@@ -249,7 +248,7 @@ export function StampSheet({ mode, onClose }: { mode: Mode; onClose: () => void 
           />
         </Field>
 
-        <Field label="Notes (optional)">
+        <Field label="Notes">
           <textarea
             value={notes}
             onChange={(e) => setNotes(e.target.value)}

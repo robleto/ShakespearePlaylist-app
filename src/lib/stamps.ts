@@ -52,9 +52,25 @@ export function formatRole(stamp: Pick<Stamp, 'director' | 'leadActor'>): string
   return ''
 }
 
+/** A stamp is "documented" if it carries any substantive field. An empty
+ * attestation — the user said "I saw it" without filling anything in —
+ * renders as the seen-nodata mark.
+ */
+function isDocumented(s: Stamp): boolean {
+  return !!(
+    s.date ||
+    s.productionCompany ||
+    s.venue ||
+    s.city ||
+    s.director ||
+    s.leadActor ||
+    s.notes
+  )
+}
+
 export function deriveMode(stamps: Stamp[]): StampMode {
   if (stamps.length === 0) return 'unstamped'
-  if (stamps.every((s) => !s.date)) return 'nodata'
+  if (stamps.every((s) => !isDocumented(s))) return 'nodata'
   if (stamps.length === 1) return 'stamped'
   return 'multi'
 }

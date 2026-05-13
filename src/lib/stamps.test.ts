@@ -83,8 +83,36 @@ describe('stamps render helpers', () => {
       expect(deriveMode([base, { ...base, id: 's-2' }])).toBe('multi')
     })
 
-    it('nodata when every stamp lacks a date', () => {
-      expect(deriveMode([{ ...base, date: '' }])).toBe('nodata')
+    it('nodata when every stamp is empty across all fields', () => {
+      const empty: Stamp = {
+        id: 's-empty',
+        playId: 'hamlet',
+        date: '',
+        productionCompany: '',
+        venue: '',
+        city: '',
+        createdAt: '2024-03-15T10:00:00.000Z',
+        source: 'manual',
+      }
+      expect(deriveMode([empty])).toBe('nodata')
+    })
+
+    it('stamped when only the date is empty but other fields are filled', () => {
+      expect(deriveMode([{ ...base, date: '' }])).toBe('stamped')
+    })
+
+    it('stamped when only the date is filled (year-only counts)', () => {
+      const yearOnly: Stamp = {
+        id: 's-year',
+        playId: 'hamlet',
+        date: '2023',
+        productionCompany: '',
+        venue: '',
+        city: '',
+        createdAt: '2024-03-15T10:00:00.000Z',
+        source: 'manual',
+      }
+      expect(deriveMode([yearOnly])).toBe('stamped')
     })
   })
 
