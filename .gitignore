@@ -62,3 +62,6 @@ pids
 
 # Prisma
 prisma/migrations/**/migration.sql
+
+# Design handoff (working copy of Shake.zip extraction)
+.design-handoff/

@@ -1,0 +1,21 @@
+# Netlify build configuration.
+#
+# The repo uses pnpm (package.json declares packageManager: pnpm@10.18.3).
+# Netlify auto-detects pnpm-lock.yaml and runs corepack to honor it.
+# The @netlify/plugin-nextjs is auto-installed for Next.js sites; declared
+# here for explicitness so future readers know what's running.
+#
+# Required runtime env var (set in Netlify dashboard, not in this file):
+#   ANTHROPIC_API_KEY — needed for /api/chat (intake). Without it, the
+#   endpoint returns 503 "Chat is not configured on this server" and the
+#   rest of the app still works.
+
+[build]
+  command = "pnpm build"
+  publish = ".next"
+
+[build.environment]
+  NODE_VERSION = "20"
+
+[[plugins]]
+  package = "@netlify/plugin-nextjs"

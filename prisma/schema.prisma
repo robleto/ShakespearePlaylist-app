@@ -1,5 +1,8 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
+// Shakespeare Playbook — Prisma schema
+//
+// v1 stores stamps in localStorage; this schema sits dormant but is
+// the v2 destination when accounts come online. Models intentionally
+// mirror the TypeScript types in src/types/.
 
 generator client {
   provider = "prisma-client-js"
@@ -10,23 +13,6 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum Role {
-  ADMIN
-}
-
-enum SourceKind {
-  ICS
-  JSONLD
-  HTML
-}
-
-enum ProductionStatus {
-  PUBLISHED
-  REVIEW
-  ARCHIVED
-}
-
-// High-level categorization for canonical plays
 enum PlayCategory {
   COMEDY
   TRAGEDY
@@ -79,175 +65,32 @@ enum CanonicalPlay {
   OTHER
 }
 
-model User {
-  id            String    @id @default(cuid())
-  email         String    @unique
-  emailVerified DateTime?
-  role          Role      @default(ADMIN)
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-
-  accounts Account[]
-  sessions Session[]
-
-  @@map("users")
-}
-
-model Account {
-  id                String  @id @default(cuid())
-  userId            String
-  type              String
-  provider          String
-  providerAccountId String
-  refresh_token     String? @db.Text
-  access_token      String? @db.Text
-  expires_at        Int?
-  token_type        String?
-  scope             String?
-  id_token          String? @db.Text
-  session_state     String?
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@unique([provider, providerAccountId])
-  @@map("accounts")
-}
-
-model Session {
-  id           String   @id @default(cuid())
-  sessionToken String   @unique
-  userId       String
-  expires      DateTime
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@map("sessions")
-}
-
-model VerificationToken {
-  identifier String
-  token      String   @unique
-  expires    DateTime
-
-  @@unique([identifier, token])
-  @@map("verification_tokens")
-}
-
-model Company {
-  id        String   @id @default(uuid())
-  name      String
-  website   String
-  // Optional: primary page containing current season / production listings for targeted scraping
-  listingsPageUrl String?
-  city      String
-  region    String
-  country   String   @default("US")
-  lat       Float?
-  lng       Float?
-  // Human-friendly slug for public routes. Will be backfilled via script.
-  slug      String?  @unique
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  venues      Venue[]
-  sources     Source[]
-  productions Production[]
-
-  @@map("companies")
-}
-
-model Venue {
-  id        String   @id @default(uuid())
-  name      String
-  address   String?
-  city      String
-  region    String
-  country   String   @default("US")
-  lat       Float?
-  lng       Float?
-  companyId String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  company     Company?     @relation(fields: [companyId], references: [id])
-  productions Production[]
-
-  @@map("venues")
-}
-
-model Source {
-  id           String     @id @default(uuid())
-  companyId    String
-  url          String
-  kind         SourceKind
-  parserName   String
-  enabled      Boolean    @default(true)
-  lastRunAt    DateTime?
-  lastStatus   String?
-  etag         String?
-  lastModified String?
-  createdAt    DateTime   @default(now())
-  updatedAt    DateTime   @updatedAt
-
-  company Company   @relation(fields: [companyId], references: [id])
-  rawPages RawPage[]
-
-  @@map("sources")
-}
-
-model Production {
-  id                String           @id @default(uuid())
-  companyId         String
-  venueId           String?
-  titleRaw          String
-  canonicalPlay     CanonicalPlay
-  startDate         DateTime
-  endDate           DateTime
-  perfDates         Json?
-  eventUrl          String?
-  priceMin          Int?
-  priceMax          Int?
-  notes             String?
-  lastSeenAt        DateTime         @default(now())
-  status            ProductionStatus @default(REVIEW)
-  sourceConfidence  Float            @default(0.5)
-  createdAt         DateTime         @default(now())
-  updatedAt         DateTime         @updatedAt
-
-  company Company @relation(fields: [companyId], references: [id])
-  venue   Venue?  @relation(fields: [venueId], references: [id])
-
-  @@index([companyId, canonicalPlay, startDate])
-  @@map("productions")
-}
-
-model RawPage {
-  id           String   @id @default(uuid())
-  sourceId     String
-  fetchedAt    DateTime @default(now())
-  url          String
-  httpStatus   Int
-  etag         String?
-  lastModified String?
-  contentHash  String
-  content      String   @db.Text
-  createdAt    DateTime @default(now())
-
-  source Source @relation(fields: [sourceId], references: [id])
-
-  @@map("raw_pages")
+enum StampSource {
+  MANUAL
+  AI_CHAT
 }
 
 model Play {
-  id            String         @id @default(cuid())
-  canonicalPlay CanonicalPlay  @unique
-  slug          String         @unique
-  title         String
-  abbrev        String?
-  categories    PlayCategory[]
-  altTitles     String[]      @default([])
-  isApocrypha   Boolean        @default(false)
-  createdAt     DateTime       @default(now())
-  updatedAt     DateTime       @updatedAt
+  id                  String         @id @default(cuid())
+  canonicalPlay       CanonicalPlay  @unique
+  slug                String         @unique
+  serial              String         @unique
+  title               String
+  abbrev              String?
+  genre               PlayCategory
+  yearWritten         Int
+  acts                Int
+  characterCount      Int
+  inFirstFolio        Boolean        @default(true)
+  source              String?
+  approximateRuntime  Int
+  notableLines        String[]       @default([])
+  altTitles           String[]       @default([])
+  isApocrypha         Boolean        @default(false)
+  createdAt           DateTime       @default(now())
+  updatedAt           DateTime       @updatedAt
+
+  stamps Stamp[]
 
   @@map("plays")
 }
@@ -261,4 +104,27 @@ model Alias {
   updatedAt     DateTime      @updatedAt
 
   @@map("aliases")
+}
+
+// v1: stamps live in localStorage. v2: stamps belong to a User and are
+// persisted here. Schema is shaped now so the migration is additive
+// (introduce User, foreign-key Stamp.userId) instead of restructuring.
+model Stamp {
+  id                 String      @id @default(uuid())
+  playId             String
+  date               DateTime
+  productionCompany  String
+  venue              String
+  city               String
+  director           String?
+  leadActor          String?
+  notes              String?
+  source             StampSource @default(MANUAL)
+  createdAt          DateTime    @default(now())
+  updatedAt          DateTime    @updatedAt
+
+  play Play @relation(fields: [playId], references: [id])
+
+  @@index([playId, date])
+  @@map("stamps")
 }
