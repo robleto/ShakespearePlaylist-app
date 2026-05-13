@@ -34,6 +34,15 @@ describe('stamps render helpers', () => {
     it('tolerates a full ISO timestamp', () => {
       expect(formatStampDate('2024-03-14T22:00:00.000Z')).toBe('14·MAR·2024')
     })
+
+    it('formats year + month as MMM·YYYY', () => {
+      expect(formatStampDate('2024-03')).toBe('MAR·2024')
+      expect(formatStampDate('2025-10')).toBe('OCT·2025')
+    })
+
+    it('passes year-only through unchanged', () => {
+      expect(formatStampDate('2024')).toBe('2024')
+    })
   })
 
   describe('formatVenue', () => {

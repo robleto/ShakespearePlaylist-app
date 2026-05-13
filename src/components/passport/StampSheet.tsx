@@ -69,13 +69,18 @@ export function StampSheet({ mode, onClose }: { mode: Mode; onClose: () => void 
       setError('Production company, venue, and city are required.')
       return
     }
-    if (!date) {
-      setError('Date is required.')
+    const dateTrim = date.trim()
+    if (!dateTrim) {
+      setError('Date is required — year at minimum (e.g. 2026).')
+      return
+    }
+    if (!/^\d{4}(-\d{2}(-\d{2})?)?$/.test(dateTrim)) {
+      setError('Date must be 2026, 2026-05, or 2026-05-12.')
       return
     }
     const draft: StampDraft = {
       playId,
-      date,
+      date: dateTrim,
       productionCompany: productionCompany.trim(),
       venue: venue.trim(),
       city: city.trim(),
@@ -177,12 +182,16 @@ export function StampSheet({ mode, onClose }: { mode: Mode; onClose: () => void 
           </button>
         </header>
 
-        <Field label="Date">
+        <Field label="Date — year required, full date if known">
           <input
-            type="date"
+            type="text"
             value={date}
             onChange={(e) => setDate(e.target.value)}
+            placeholder="2026 or 2026-05 or 2026-05-12"
+            pattern="\d{4}(-\d{2}(-\d{2})?)?"
+            title="2026, 2026-05, or 2026-05-12"
             required
+            autoComplete="off"
             style={inputStyle}
           />
         </Field>

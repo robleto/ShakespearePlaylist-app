@@ -3,6 +3,7 @@ export type StampSource = 'manual' | 'ai-chat'
 export type Stamp = {
   id: string
   playId: string
+  /** Year minimum; partial dates allowed. One of: "YYYY", "YYYY-MM", "YYYY-MM-DD". */
   date: string
   productionCompany: string
   venue: string

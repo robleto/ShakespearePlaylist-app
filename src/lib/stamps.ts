@@ -14,14 +14,30 @@ export type StampRenderData = {
 
 const MONTHS = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC']
 
-/** Format an ISO date "YYYY-MM-DD..." as the design's "14·MAR·2024". */
+/** Format a partial-or-full ISO date as the design's "14·MAR·2024".
+ * Accepts:
+ *   "2024-03-14" → "14·MAR·2024"
+ *   "2024-03"    → "MAR·2024"
+ *   "2024"       → "2024"
+ *   ""           → ""
+ */
 export function formatStampDate(iso: string): string {
   if (!iso) return ''
-  const m = iso.match(/^(\d{4})-(\d{2})-(\d{2})/)
-  if (!m) return iso
-  const [, year, month, day] = m
-  const idx = parseInt(month, 10) - 1
-  return `${day}·${MONTHS[idx] ?? month}·${year}`
+  const full = iso.match(/^(\d{4})-(\d{2})-(\d{2})/)
+  if (full) {
+    const [, year, month, day] = full
+    const idx = parseInt(month, 10) - 1
+    return `${day}·${MONTHS[idx] ?? month}·${year}`
+  }
+  const yearMonth = iso.match(/^(\d{4})-(\d{2})$/)
+  if (yearMonth) {
+    const [, year, month] = yearMonth
+    const idx = parseInt(month, 10) - 1
+    return `${MONTHS[idx] ?? month}·${year}`
+  }
+  const yearOnly = iso.match(/^\d{4}$/)
+  if (yearOnly) return iso
+  return iso
 }
 
 /** "Barbican · London" from venue + city. */

@@ -4,7 +4,7 @@ import { z } from 'zod'
 export const extractedSchema = z.object({
   kind: z.literal('extracted'),
   playId: z.string().min(1),
-  date: z.union([z.string().regex(/^\d{4}-\d{2}-\d{2}$/), z.null()]).optional(),
+  date: z.union([z.string().regex(/^\d{4}(-\d{2}(-\d{2})?)?$/), z.null()]).optional(),
   productionCompany: z.union([z.string(), z.null()]).optional(),
   venue: z.union([z.string(), z.null()]).optional(),
   city: z.union([z.string(), z.null()]).optional(),

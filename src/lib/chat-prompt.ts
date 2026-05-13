@@ -18,8 +18,9 @@ the structured fields below.
 
 Today's date: ${todayISO}
 Resolve any relative dates ("last Tuesday", "two weeks ago", "last summer")
-against today. If the user gives a year only, leave the date null. Never
-invent dates.
+against today. Return whatever precision the user gave — full date as
+"YYYY-MM-DD", month + year as "YYYY-MM", year alone as "YYYY". If the
+user gives nothing date-like, set date to null. Never invent precision.
 
 Respond with a single JSON object — no prose, no markdown, no code fence.
 The JSON must be one of these two shapes:
@@ -28,7 +29,7 @@ EXTRACTED — when you can identify the play with confidence:
 {
   "kind": "extracted",
   "playId": "<one of the 39 ids below>",
-  "date": "YYYY-MM-DD" or null,
+  "date": "YYYY-MM-DD" | "YYYY-MM" | "YYYY" or null,
   "productionCompany": "<name>" or null,
   "venue": "<building/space>" or null,
   "city": "<city name>" or null,
