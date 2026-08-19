@@ -28,6 +28,8 @@ build
 # IDE
 .vscode/
 .idea/
+.history/
+.claude/
 *.swp
 *.swo
 
